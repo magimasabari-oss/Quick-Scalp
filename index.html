@@ -1,0 +1,3633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCALPER MAGIMA MINI — 1H Structural SL</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* ===================================================================
+   SCALPER MAGIMA — Design System
+   Preserved from v2, extended with new status indicators
+=================================================================== */
+:root{
+  --bg:#010306;--panel:rgba(255,140,0,0.04);--border:rgba(255,140,0,0.18);
+  --orange:#ff8c00;--gold:#ffd600;--green:#00ff88;--red:#ff3355;
+  --cyan:#00c8ff;--text:#f0e0c8;--text2:#8a7a6a;--purple:#b060ff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,140,0,0.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,140,0,0.025) 1px,transparent 1px);
+  background-size:32px 32px;pointer-events:none;z-index:0}
+.scanline{position:fixed;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--orange),transparent);
+  animation:scan 3s linear infinite;opacity:.2;z-index:1;pointer-events:none}
+@keyframes scan{from{top:0}to{top:100vh}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.container{position:relative;z-index:2;max-width:1140px;margin:0 auto;padding:12px}
+header{display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;
+  border-bottom:1px solid var(--border);margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.logo{font-family:'Rajdhani';font-weight:900;font-size:1.3rem;color:var(--orange);
+  text-shadow:0 0 22px var(--orange);letter-spacing:4px}
+.logo span{color:var(--gold)}.logo sup{font-size:.42rem;color:var(--cyan);letter-spacing:1px}
+.status-row{display:flex;gap:6px;flex-wrap:wrap}
+.status-pill{display:flex;align-items:center;gap:5px;background:var(--panel);
+  border:1px solid var(--border);padding:4px 10px;border-radius:20px;
+  font-family:'Share Tech Mono';font-size:.63rem;color:var(--text2)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text2)}
+.dot.live{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.5s infinite}
+.dot.running{background:var(--orange);box-shadow:0 0 8px var(--orange);animation:pulse 1s infinite}
+.dot.paused{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.dot.error{background:var(--red)}
+
+/* LIVE POSITIONS */
+.live-panel{background:linear-gradient(135deg,rgba(255,140,0,0.08),rgba(255,214,0,0.04));
+  border:1px solid var(--orange);border-radius:14px;padding:16px 20px;
+  margin-bottom:12px;display:none;position:relative;overflow:hidden}
+.live-panel.active{display:block}
+.live-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--orange),var(--gold),transparent)}
+.lp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.lp-title{font-family:'Rajdhani';font-size:.58rem;color:var(--orange);letter-spacing:3px}
+.lp-badge{font-family:'Share Tech Mono';font-size:.56rem;padding:3px 9px;border-radius:10px;
+  background:rgba(255,140,0,.15);color:var(--orange);animation:pulse 1.5s infinite}
+.lp-badge.long{background:rgba(0,255,136,.15);color:var(--green)}
+.lp-badge.short{background:rgba(255,51,85,.15);color:var(--red)}
+.positions-grid{display:grid;gap:8px}
+/* Extended position card for v3 */
+.pos-card{background:rgba(255,140,0,.04);border:1px solid var(--border);border-radius:10px;
+  padding:11px;display:grid;grid-template-columns:1.3fr 1.7fr 1fr 1fr 1fr 1fr 0.85fr;gap:7px;align-items:center}
+.pos-card.long-card{border-left:3px solid var(--green)}
+.pos-card.short-card{border-left:3px solid var(--red)}
+@media(max-width:800px){.pos-card{grid-template-columns:1fr 1fr;gap:7px}}
+.pc-item{display:flex;flex-direction:column;gap:3px}
+.pc-label{font-family:'Share Tech Mono';font-size:.48rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase}
+.pc-val{font-family:'Rajdhani';font-weight:700;line-height:1}
+.pc-coin{font-size:1.2rem;color:var(--orange)}
+.pc-pnl{font-size:1.4rem}
+.pc-pnl.pos{color:var(--green);text-shadow:0 0 14px rgba(0,255,136,.5)}
+.pc-pnl.neg{color:var(--red);text-shadow:0 0 14px rgba(255,51,85,.5)}
+.pc-pnl.zero{color:var(--gold)}
+.pc-sm{font-size:.75rem;color:var(--text)}
+.pc-green{color:var(--green)}.pc-red{color:var(--red)}.pc-gold{color:var(--gold)}
+.pc-cyan{color:var(--cyan)}.pc-orange{color:var(--orange)}.pc-purple{color:var(--purple)}
+/* Staged exit indicators */
+.pc-stage{font-family:'Share Tech Mono';font-size:.48rem;padding:2px 5px;border-radius:5px;margin-top:3px;display:inline-block}
+.stage-hunt{background:rgba(0,200,255,.15);color:var(--cyan)}
+.stage-tp1{background:rgba(0,255,136,.15);color:var(--green)}
+.stage-trail{background:rgba(255,214,0,.15);color:var(--gold)}
+.stage-be{background:rgba(0,255,136,.08);color:var(--green)}
+.pc-close-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--red);
+  background:rgba(255,51,85,.08);color:var(--red);font-family:'Rajdhani';
+  font-size:.55rem;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s;width:100%;margin-top:6px}
+.pc-close-btn:hover{background:rgba(255,51,85,.2)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal-box{background:#07080a;border:1px solid var(--red);border-radius:14px;padding:22px 26px;text-align:center;max-width:380px;width:95%}
+.modal-title{font-family:'Rajdhani';font-size:1rem;color:var(--red);letter-spacing:2px;margin-bottom:7px}
+.modal-sub{font-family:'Share Tech Mono';font-size:.6rem;color:var(--text2);margin-bottom:16px;line-height:1.6}
+.modal-btns{display:flex;gap:9px;justify-content:center}
+.modal-yes{padding:9px 24px;border-radius:7px;border:1px solid var(--red);
+  background:rgba(255,51,85,.2);color:var(--red);font-family:'Rajdhani';
+  font-size:.76rem;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.modal-yes:hover{background:var(--red);color:#fff}
+.modal-no{padding:9px 24px;border-radius:7px;border:1px solid var(--border);background:transparent;
+  color:var(--text2);font-family:'Rajdhani';font-size:.76rem;font-weight:700;letter-spacing:2px;
+  cursor:pointer;transition:all .2s}
+.modal-no:hover{border-color:var(--orange);color:var(--orange)}
+.modal-info-row{display:flex;justify-content:space-between;background:rgba(255,140,0,.04);
+  border:1px solid var(--border);border-radius:7px;padding:7px 11px;margin-bottom:11px}
+.modal-info-item{display:flex;flex-direction:column;align-items:center;gap:2px}
+.modal-info-label{font-family:'Share Tech Mono';font-size:.48rem;color:var(--text2);letter-spacing:2px}
+.modal-info-val{font-family:'Rajdhani';font-size:.82rem;font-weight:700}
+.modal-price-input{width:100%;background:rgba(255,140,0,.06);border:1px solid var(--orange);
+  border-radius:7px;padding:8px 11px;color:var(--orange);font-family:'Share Tech Mono';
+  font-size:.75rem;outline:none;text-align:center;margin-bottom:12px}
+.modal-price-label{font-family:'Share Tech Mono';font-size:.5rem;color:var(--text2);
+  letter-spacing:2px;margin-bottom:4px;text-align:left}
+
+/* PANELS */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--orange),transparent)}
+.panel-title{font-family:'Rajdhani';font-size:.58rem;font-weight:700;color:var(--orange);
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:7px}
+.panel-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:520px){.input-grid{grid-template-columns:1fr}}
+.input-group{display:flex;flex-direction:column;gap:4px}
+.input-group label{font-family:'Share Tech Mono';font-size:.54rem;color:var(--text2);
+  letter-spacing:2px;text-transform:uppercase}
+.input-group input,.input-group select{background:rgba(255,140,0,.05);border:1px solid var(--border);
+  border-radius:6px;padding:7px 10px;color:var(--text);font-family:'Share Tech Mono';
+  font-size:.75rem;outline:none;transition:border-color .2s}
+.input-group input:focus,.input-group select:focus{border-color:var(--orange);box-shadow:0 0 8px rgba(255,140,0,.12)}
+.input-group input::placeholder{color:var(--text2);opacity:.4}
+.input-group select option{background:#07080a}
+.btn-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:6px;border:none;font-family:'Rajdhani';font-size:.58rem;
+  font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-primary{background:linear-gradient(135deg,var(--orange),#cc5500);color:#000;box-shadow:0 0 16px rgba(255,140,0,.3)}
+.btn-primary:hover{box-shadow:0 0 26px rgba(255,140,0,.6);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-danger{background:linear-gradient(135deg,var(--red),#aa0020);color:#fff}
+.btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
+@media(max-width:700px){.stats-row{grid-template-columns:repeat(3,1fr)}}
+.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:11px}
+.stat-label{font-family:'Share Tech Mono';font-size:.52rem;color:var(--text2);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.stat-value{font-family:'Rajdhani';font-size:1.05rem;font-weight:700;line-height:1}
+.stat-value.green{color:var(--green)}.stat-value.cyan{color:var(--cyan)}
+.stat-value.yellow{color:var(--gold)}.stat-value.red{color:var(--red)}
+.stat-value.orange{color:var(--orange)}.stat-value.purple{color:var(--purple)}
+.stat-sub{font-family:'Share Tech Mono';font-size:.5rem;color:var(--text2);margin-top:2px}
+
+/* REGIME */
+.regime-bar{background:var(--panel);border:1px solid var(--border);border-radius:10px;
+  padding:11px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.regime-label{font-family:'Share Tech Mono';font-size:.54rem;color:var(--text2);letter-spacing:2px}
+.regime-badge{font-family:'Rajdhani';font-size:.7rem;font-weight:700;padding:4px 12px;
+  border-radius:16px;letter-spacing:2px}
+.regime-hot{background:rgba(255,140,0,.2);color:var(--orange);border:1px solid rgba(255,140,0,.4)}
+.regime-warm{background:rgba(255,214,0,.15);color:var(--gold);border:1px solid rgba(255,214,0,.3)}
+.regime-cold{background:rgba(100,100,120,.15);color:var(--text2);border:1px solid rgba(100,100,120,.3)}
+.regime-stats{display:flex;gap:12px;margin-left:auto;flex-wrap:wrap}
+.rs-item{font-family:'Share Tech Mono';font-size:.57rem;color:var(--text2)}
+.rs-item span{color:var(--text)}
+
+/* SCORE SECTION */
+.score-section{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px}
+.score-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.score-title{font-family:'Rajdhani';font-size:.58rem;color:var(--orange);letter-spacing:2px}
+.score-grade{font-family:'Rajdhani';font-size:1.5rem;font-weight:700}
+.grade-a-plus{color:var(--green);text-shadow:0 0 12px rgba(0,255,136,.5)}
+.grade-a{color:var(--gold)}.grade-b{color:var(--orange)}.grade-c{color:var(--red)}
+.score-bars{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+@media(max-width:520px){.score-bars{grid-template-columns:1fr}}
+.sbar{display:flex;align-items:center;gap:6px}
+.sbar-label{font-family:'Share Tech Mono';font-size:.5rem;color:var(--text2);width:82px;white-space:nowrap}
+.sbar-track{flex:1;height:5px;background:rgba(255,140,0,.07);border-radius:3px;overflow:hidden;border:1px solid rgba(255,140,0,.08)}
+.sbar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.sbar-fill.high{background:var(--green)}.sbar-fill.mid{background:var(--gold)}.sbar-fill.low{background:var(--red)}
+.sbar-num{font-family:'Rajdhani';font-size:.56rem;color:var(--text);width:26px;text-align:right}
+
+/* SIGNAL MONITOR */
+.signal-monitor{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px}
+.signal-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:8px}
+@media(max-width:600px){.signal-grid{grid-template-columns:repeat(3,1fr)}}
+.signal-card{background:rgba(255,140,0,.03);border:1px solid var(--border);border-radius:6px;padding:6px;text-align:center}
+.signal-card.bullish{border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.04)}
+.signal-card.bearish{border-color:rgba(255,51,85,.4);background:rgba(255,51,85,.04)}
+.sc-pair{font-family:'Share Tech Mono';font-size:.54rem;color:var(--orange);margin-bottom:2px}
+.sc-signal{font-family:'Rajdhani';font-size:.52rem;font-weight:700}
+.sc-bull{color:var(--green)}.sc-bear{color:var(--red)}.sc-neut{color:var(--gold)}
+.sc-score{font-family:'Share Tech Mono';font-size:.48rem;color:var(--text2);margin-top:1px}
+.sc-setup{font-family:'Share Tech Mono';font-size:.44rem;color:var(--text2);margin-top:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* INDICATOR GRID */
+.indicator-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:9px}
+@media(max-width:600px){.indicator-grid{grid-template-columns:repeat(3,1fr)}}
+.ind-card{background:rgba(255,140,0,.03);border:1px solid var(--border);border-radius:7px;padding:7px;text-align:center}
+.ind-card.bull{border-color:rgba(0,255,136,.5);background:rgba(0,255,136,.05)}
+.ind-card.bear{border-color:rgba(255,51,85,.5);background:rgba(255,51,85,.05)}
+.ind-card.neut{border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.03)}
+.ind-name{font-family:'Share Tech Mono';font-size:.48rem;color:var(--text2);margin-bottom:2px}
+.ind-val{font-family:'Rajdhani';font-size:.55rem;font-weight:700}
+.ind-bull{color:var(--green)}.ind-bear{color:var(--red)}.ind-neut{color:var(--gold)}
+
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1fr 280px;gap:10px;margin-bottom:12px}
+@media(max-width:760px){.main-grid{grid-template-columns:1fr}}
+.trade-log{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.log-header{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.log-title{font-family:'Rajdhani';font-size:.54rem;color:var(--orange);letter-spacing:2px}
+.log-count{font-family:'Share Tech Mono';font-size:.54rem;color:var(--text2)}
+.log-body{height:280px;overflow-y:auto;padding:4px}
+.log-body::-webkit-scrollbar{width:3px}
+.log-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.trade-entry{display:grid;grid-template-columns:30px 1.1fr 22px 38px 70px 44px 60px;gap:4px;
+  align-items:center;padding:5px 6px;border-radius:5px;margin-bottom:2px;
+  font-family:'Share Tech Mono';font-size:.58rem;border:1px solid transparent;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.trade-entry.win{border-left:2px solid var(--green);background:rgba(0,255,136,.03)}
+.trade-entry.loss{border-left:2px solid var(--red);background:rgba(255,51,85,.03)}
+.trade-entry.open{border-left:2px solid var(--orange);background:rgba(255,140,0,.03)}
+.te-time{color:var(--text2);font-size:.48rem}
+.te-pair{color:var(--orange);font-weight:600}
+.te-long{color:var(--green)}.te-short{color:var(--red)}
+.te-pnl-pos{color:var(--green);font-weight:600}.te-pnl-neg{color:var(--red);font-weight:600}
+.te-status{font-size:.48rem;padding:1px 4px;border-radius:3px;text-align:center}
+.te-open{background:rgba(255,140,0,.15);color:var(--orange)}
+.te-closed{background:rgba(0,255,136,.1);color:var(--green)}
+.te-stopped{background:rgba(255,51,85,.1);color:var(--red)}
+.te-setup{font-size:.42rem;color:var(--text2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* STRATEGY PANEL */
+.strategy-panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.sp-header{padding:8px 12px;border-bottom:1px solid var(--border)}
+.sp-title{font-family:'Rajdhani';font-size:.54rem;color:var(--orange);letter-spacing:2px}
+.sp-body{padding:8px;max-height:280px;overflow-y:auto}
+.sp-body::-webkit-scrollbar{width:3px}
+.sp-body::-webkit-scrollbar-thumb{background:var(--border)}
+.sp-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,140,0,.04)}
+.sp-row:last-child{border-bottom:none}
+.sp-key{color:var(--text2);font-family:'Share Tech Mono';font-size:.52rem}
+.sp-val{color:var(--text);font-family:'Share Tech Mono';font-size:.56rem}
+.sp-val.green{color:var(--green)}.sp-val.yellow{color:var(--gold)}
+.sp-val.orange{color:var(--orange)}.sp-val.red{color:var(--red)}.sp-val.purple{color:var(--purple)}
+
+/* MARKET */
+.market-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
+@media(max-width:560px){.market-grid{grid-template-columns:repeat(3,1fr)}}
+.market-card{background:rgba(255,140,0,.03);border:1px solid var(--border);border-radius:7px;padding:8px;text-align:center}
+.mc-label{font-family:'Share Tech Mono';font-size:.51rem;color:var(--text2);margin-bottom:3px}
+.mc-val{font-family:'Rajdhani';font-size:.64rem;font-weight:700}
+.mc-green{color:var(--green)}.mc-red{color:var(--red)}.mc-gold{color:var(--gold)}
+.mc-orange{color:var(--orange)}.mc-cyan{color:var(--cyan)}.mc-purple{color:var(--purple)}
+
+/* UNIVERSE */
+.universe-bar{background:rgba(255,140,0,.03);border:1px solid var(--border);border-radius:8px;
+  padding:9px 12px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.universe-label{font-family:'Share Tech Mono';font-size:.54rem;color:var(--text2);letter-spacing:2px}
+.universe-count{font-family:'Rajdhani';font-size:.85rem;font-weight:700;color:var(--orange)}
+.universe-progress{flex:1;height:5px;background:rgba(255,140,0,.07);border-radius:3px;overflow:hidden;min-width:80px}
+.universe-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));border-radius:3px;transition:width .6s ease}
+
+/* CONSOLE */
+.console{background:#010205;border:1px solid var(--border);border-radius:10px;padding:10px;
+  height:130px;overflow-y:auto;font-family:'Share Tech Mono';font-size:.58rem;line-height:1.75;margin-bottom:12px}
+.console::-webkit-scrollbar{width:3px}
+.console::-webkit-scrollbar-thumb{background:var(--border)}
+.cl{margin-bottom:1px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.ct{color:var(--text2)}.ci{color:var(--cyan)}.cs{color:var(--green)}.cw{color:var(--gold)}
+.ce{color:var(--red)}.ctr{color:var(--orange)}.cp{color:var(--purple)}
+
+/* REPORT */
+.report-panel{background:rgba(255,140,0,.02);border:1px solid rgba(255,140,0,.08);
+  border-radius:10px;padding:10px 14px;margin-bottom:12px}
+.report-title{font-family:'Rajdhani';font-size:.54rem;color:var(--text2);letter-spacing:2px;margin-bottom:7px}
+.report-btns{display:flex;gap:6px;flex-wrap:wrap}
+.report-btn{padding:5px 11px;border-radius:5px;border:1px solid rgba(255,140,0,.2);
+  background:transparent;color:var(--text2);font-family:'Share Tech Mono';font-size:.56rem;cursor:pointer;transition:all .2s}
+.report-btn:hover{border-color:var(--orange);color:var(--orange);background:rgba(255,140,0,.05)}
+
+/* TIER SCANNER indicator */
+.tier-pill{font-family:'Share Tech Mono';font-size:.5rem;padding:2px 7px;border-radius:10px;
+  margin-left:6px;vertical-align:middle}
+.tier1{background:rgba(0,200,255,.1);color:var(--cyan)}
+.tier2{background:rgba(255,140,0,.1);color:var(--orange)}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+
+<!-- ===== CONFIRM CLOSE MODAL ===== -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-title">⛔ CLOSE POSITION?</div>
+    <div class="modal-sub">Limit close for <strong id="modalCoin" style="color:var(--orange)">—</strong></div>
+    <div class="modal-info-row">
+      <div class="modal-info-item"><div class="modal-info-label">PRICE</div><div class="modal-info-val" style="color:var(--orange)" id="modalCurPrice">—</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">P&L</div><div class="modal-info-val" id="modalPnl">—</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">ENTRY</div><div class="modal-info-val" style="color:var(--text)" id="modalEntry">—</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">SIDE</div><div class="modal-info-val" id="modalSide">—</div></div>
+    </div>
+    <div class="modal-price-label">LIMIT PRICE (blank = best bid/ask)</div>
+    <input class="modal-price-input" type="number" id="modalLimitPrice" placeholder="Auto best bid/ask" step="0.0001">
+    <div class="modal-btns">
+      <button class="modal-yes" onclick="confirmClose()">YES, CLOSE</button>
+      <button class="modal-no" onclick="cancelClose()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <header>
+    <div class="logo">SCALPER<span>MAGIMA</span><sup> MINI — 1H STRUCTURAL SL</sup></div>
+    <div class="status-row">
+      <div class="status-pill"><div class="dot" id="connDot"></div><span id="connLabel">DISCONNECTED</span></div>
+      <div class="status-pill"><div class="dot" id="botDot"></div><span id="botLabel">BOT IDLE</span></div>
+      <div class="status-pill hidden" id="balPill"><span id="balPillVal">0 USDT</span></div>
+    </div>
+  </header>
+
+  <!-- LIVE POSITIONS -->
+  <div class="live-panel" id="livePanel">
+    <div class="lp-header">
+      <div class="lp-title">⚡ LIVE POSITIONS — STRUCTURAL EXECUTION</div>
+      <div class="lp-badge" id="lpBadge">LOADING</div>
+    </div>
+    <div class="positions-grid" id="positionsGrid"></div>
+  </div>
+
+  <!-- API CONFIG -->
+  <div class="panel">
+    <div class="panel-title">⚡ API Configuration</div>
+    <div class="input-grid">
+      <div class="input-group"><label>Bybit API Key</label><input type="password" id="apiKey" placeholder="Paste API Key..." autocomplete="off"></div>
+      <div class="input-group"><label>Bybit API Secret</label><input type="password" id="apiSecret" placeholder="Paste Secret Key..." autocomplete="off"></div>
+      <div class="input-group"><label>Network</label>
+        <select id="network">
+          <option value="mainnet">Mainnet (Real Trading)</option>
+          <option value="testnet">Testnet (Paper Trading)</option>
+        </select>
+      </div>
+      <div class="input-group"><label>Starting Capital (USDT)</label><input type="number" id="startCapital" value="10" min="1" step="1"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="connectBtn" onclick="connectAPI()">⚡ Connect & Verify</button>
+      <button class="btn btn-primary hidden" id="startBtn" onclick="startBot()" disabled>▶ START ENGINE</button>
+      <button class="btn btn-danger hidden" id="stopBtn" onclick="stopBot()">⏹ STOP</button>
+      <button class="btn btn-secondary" onclick="clearAll()">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- STATS (6-card extended row) -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Balance</div><div class="stat-value orange" id="statBalance">—</div><div class="stat-sub">USDT</div></div>
+    <div class="stat-card"><div class="stat-label">Session P&L</div><div class="stat-value green" id="statPnl">—</div><div class="stat-sub" id="statPnlPct">+0.00%</div></div>
+    <div class="stat-card"><div class="stat-label">Total Trades</div><div class="stat-value yellow" id="statTrades">0</div><div class="stat-sub" id="statWR">W:0 L:0</div></div>
+    <div class="stat-card"><div class="stat-label">Open Slots</div><div class="stat-value cyan" id="statOpen">0/1</div><div class="stat-sub" id="statSlots">0 remaining</div></div>
+    <div class="stat-card"><div class="stat-label">Status</div><div class="stat-value orange" id="statStatus">IDLE</div><div class="stat-sub" id="statScanSub">waiting</div></div>
+  </div>
+
+  <!-- MARKET CONDITIONS -->
+  <div class="market-grid">
+    <div class="market-card"><div class="mc-label">BTC 15M Trend</div><div class="mc-val mc-orange" id="mcBtc">—</div></div>
+    <div class="market-card"><div class="mc-label">Avg Funding</div><div class="mc-val mc-orange" id="mcFunding">—</div></div>
+    <div class="market-card"><div class="mc-label">Session</div><div class="mc-val mc-gold" id="mcSession">—</div></div>
+    <div class="market-card"><div class="mc-label">Regime Score</div><div class="mc-val mc-orange" id="mcRegime">—</div></div>
+    <div class="market-card"><div class="mc-label">Focus Pairs</div><div class="mc-val mc-cyan" id="mcUniverse">—</div></div>
+  </div>
+
+  <!-- REGIME BAR -->
+  <div class="regime-bar">
+    <div class="regime-label">MARKET REGIME</div>
+    <div class="regime-badge regime-cold" id="regimeBadge">LOADING</div>
+    <div class="regime-stats">
+      <div class="rs-item">Score Thresh: <span id="regimeThresh">—</span></div>
+      <div class="rs-item">Max Pos: <span id="regimeMaxPos">—</span></div>
+      <div class="rs-item">TP1 Range: <span id="regimeTp1">—</span></div>
+      <div class="rs-item">Cooldown: <span id="regimeCooldown">—</span></div>
+    </div>
+  </div>
+
+  <!-- UNIVERSE BAR -->
+  <div class="universe-bar">
+    <div class="universe-label">TIER-1 FOCUS</div>
+    <div class="universe-count" id="universeCount">0</div>
+    <div style="font-family:'Share Tech Mono';font-size:.54rem;color:var(--text2)">pairs</div>
+    <div class="universe-progress"><div class="universe-fill" id="universeFill" style="width:0%"></div></div>
+    <div style="font-family:'Share Tech Mono';font-size:.54rem;color:var(--text2)">SAFE UNIVERSE:</div>
+    <div class="universe-count" id="universeTotal" style="font-size:.75rem">0</div>
+    <div style="font-family:'Share Tech Mono';font-size:.5rem;color:var(--text2);margin-left:auto" id="universeLastUpdate">not built yet</div>
+  </div>
+
+  <!-- SCORE DISPLAY -->
+  <div class="score-section">
+    <div class="score-header">
+      <div class="score-title">📊 ADAPTIVE SCORE — <span id="scoreSymbol">—</span></div>
+      <div class="score-grade grade-c" id="scoreGrade">—</div>
+    </div>
+    <div class="score-bars" id="scoreBars"></div>
+  </div>
+
+  <!-- SIGNAL MONITOR -->
+  <div class="signal-monitor">
+    <div class="panel-title">
+      📡 Live Scanner
+      <span class="tier-pill tier2" id="scanTierBadge">TIER-2</span>
+      <span style="font-size:.48rem;color:var(--text2);font-family:'Share Tech Mono';margin-left:8px" id="scanStatus">— waiting</span>
+    </div>
+    <div class="indicator-grid" id="indicatorGrid">
+      <div class="ind-card neut"><div class="ind-name">15M STRUCT</div><div class="ind-val ind-neut">—</div></div>
+      <div class="ind-card neut"><div class="ind-name">5M MSB</div><div class="ind-val ind-neut">—</div></div>
+      <div class="ind-card neut"><div class="ind-name">1M PULLBK</div><div class="ind-val ind-neut">—</div></div>
+      <div class="ind-card neut"><div class="ind-name">VWAP</div><div class="ind-val ind-neut">—</div></div>
+      <div class="ind-card neut"><div class="ind-name">ATR REGIME</div><div class="ind-val ind-neut">—</div></div>
+      <div class="ind-card neut"><div class="ind-name">CANDLE 15M</div><div class="ind-val ind-neut">—</div></div>
+      <div class="ind-card neut"><div class="ind-name">VOL 5M</div><div class="ind-val ind-neut">—</div></div>
+      <div class="ind-card neut"><div class="ind-name">OI FLOW</div><div class="ind-val ind-neut">—</div></div>
+      <div class="ind-card neut"><div class="ind-name">1H STRUCT SL</div><div class="ind-val ind-neut">—</div></div>
+      <div class="ind-card neut"><div class="ind-name">REGIME</div><div class="ind-val ind-neut">—</div></div>
+    </div>
+    <div class="signal-grid" id="signalGrid" style="margin-top:9px">
+      <div class="signal-card"><div class="sc-pair">WAIT</div><div class="sc-signal sc-neut">—</div><div class="sc-score">connect</div></div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+    <div class="trade-log">
+      <div class="log-header">
+        <div class="log-title">📋 Trade History</div>
+        <div class="log-count" id="logCount">0 trades</div>
+      </div>
+      <div class="log-body" id="tradeLog">
+        <div style="color:var(--text2);font-family:'Share Tech Mono';font-size:.56rem;padding:12px;text-align:center;opacity:.5">No trades yet.</div>
+      </div>
+    </div>
+    <div class="strategy-panel">
+      <div class="sp-header"><div class="sp-title">⚙ SCALPER MAGIMA</div></div>
+      <div class="sp-body">
+        <div class="sp-row"><span class="sp-key">Architecture</span><span class="sp-val orange">MINI — 1H Structural SL</span></div>
+        <div class="sp-row"><span class="sp-key">Setup Layer</span><span class="sp-val cyan">v8 Adaptive Dual-Setup (preserved)</span></div>
+        <div class="sp-row"><span class="sp-key">Entry Layer</span><span class="sp-val cyan">MSS Pullback + VWAP Retest + Window</span></div>
+        <div class="sp-row"><span class="sp-key">Entry Score</span><span class="sp-val cyan">Dual: setupScore + entryScore</span></div>
+        <div class="sp-row"><span class="sp-key">Candle Quality</span><span class="sp-val cyan">Close position ranking (not filter)</span></div>
+        <div class="sp-row"><span class="sp-key">Timeout Safety</span><span class="sp-val yellow">Never miss a valid trade</span></div>
+        <div class="sp-row"><span class="sp-key">Tier-1 Scan</span><span class="sp-val yellow">Every 15s — ranking (MINI)</span></div>
+        <div class="sp-row"><span class="sp-key">Tier-2 Scan</span><span class="sp-val yellow">Every 2s — deep analysis (MINI)</span></div>
+        <div class="sp-row"><span class="sp-key">TP1 (75%)</span><span class="sp-val green">ATR-based → Breakeven+</span></div>
+        <div class="sp-row"><span class="sp-key">Runner (25%)</span><span class="sp-val purple">5M EMA/ATR trail</span></div>
+        <div class="sp-row"><span class="sp-key">1H Structural SL</span><span class="sp-val yellow">1H swing wick anchor</span></div>
+        <div class="sp-row"><span class="sp-key">Leverage</span><span class="sp-val cyan">Dynamic: 1/(SL%×1.25)</span></div>
+        <div class="sp-row"><span class="sp-key">Max Positions</span><span class="sp-val yellow">1 (hard cap — single trade)</span></div>
+        <div class="sp-row"><span class="sp-key">Score Thresh</span><span class="sp-val green">HOT≥60 WARM≥63 COLD≥67 (MINI)</span></div>
+        <div class="sp-row"><span class="sp-key">Spread</span><span class="sp-val green">Max 0.12%</span></div>
+        <div class="sp-row"><span class="sp-key">BTC Corr Gate</span><span class="sp-val green">✓ Per-symbol 1M</span></div>
+        <div class="sp-row"><span class="sp-key">OB Depth</span><span class="sp-val green">✓ Liquidity check</span></div>
+        <div class="sp-row"><span class="sp-key">Fee Coverage</span><span class="sp-val green">✓ Min 3× fees</span></div>
+        <div class="sp-row"><span class="sp-key">Session P&L</span><span class="sp-val green" id="spPnl">+$0.00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="report-panel">
+    <div class="report-title">📥 TRADE REPORTS</div>
+    <div class="report-btns">
+      <button class="report-btn" onclick="downloadReport('today')">📄 Today</button>
+      <button class="report-btn" onclick="downloadReport('month')">📅 This Month</button>
+      <button class="report-btn" onclick="downloadReport('all')">📦 All Trades</button>
+      <button class="report-btn" onclick="downloadReport('last')">⬇ Last Trade</button>
+    </div>
+  </div>
+
+  <div class="panel-title" style="margin-bottom:6px">🖥 Console</div>
+  <div class="console" id="console">
+    <div class="cl"><span class="ct">[--:--:--]</span> <span class="ci">SCALPER MAGIMA MINI — 1H STRUCTURAL SL | High-frequency relaxed variant of v9 | SL: 1H structural swing (tighter than v9's 4H) | Score thresholds: HOT≥60 WARM≥63 COLD≥67 | CT-Tax: 5pts | Scan: T1=15s T2=2s | TP: HOT 1.8–3.2% WARM 1.2–2.2% COLD 0.8–1.5% | All v8/v9 strategy logic intact</span></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SCALPER MAGIMA — STRUCTURAL EXECUTION ENGINE
+// ============================================================
+// Philosophy: High-quality structural entries, moderate repeatable
+// profit extraction, fast capital redeployment, intraday structural
+// compounding. Daily expectancy over single-trade RR.
+//
+// Architecture:
+//   ENTRY:  15M S/R zone → reversal candle → 5M MSB → 1M pullback trigger
+//   EXIT:   ATR-based TP1 (75%) + aggressive runner trail (25%)
+//   SL:     4H structural swing — macro context, LTF-noise immune
+//   RISK:   Dynamic leverage = 1/(SL%×1.25), max 1 position
+//   SAFETY: Volatility circuit breaker only
+//   SCAN:   Tier-1 every 60s (rankings), Tier-2 every 6s (deep)
+// ============================================================
+
+const URLS = { mainnet:'https://api.bybit.com', testnet:'https://api-testnet.bybit.com' };
+
+// ============================================================
+// SECTION A — CONFIGURATION CONSTANTS
+// ============================================================
+
+// Hard limits — change with care
+const MAX_POSITIONS           = 1;      // absolute position cap — FIXED 1 (single trade at a time)
+const DAILY_DD_PCT_LIMIT      = 0.06;   // retained as dead variable — feature removed
+const SPREAD_MAX_PCT          = 0.0012; // 0.12% max spread
+const UNIVERSE_CAP            = 120;    // max safe pairs in universe
+const UNIVERSE_REFRESH_MS     = 30 * 60 * 1000; // 30 min universe rebuild
+const TIER1_INTERVAL_MS       = 15000;  // 15s macro scanner — tighter for MINI high frequency
+const TIER2_INTERVAL_MS       = 2000;   // 2s deep analysis — near real-time reaction for MINI
+// (stale exit feature removed)
+
+// ATR multiplier for TP1 per regime — slightly higher for MINI (tighter 1H SL = better R:R)
+const ATR_TP_MULT = { HOT:3.2, WARM:2.4, COLD:1.7 };
+// TP1 take %: 75% fast extraction. Runner: remaining 25%.
+const TP1_QTY_RATIO  = 0.75;
+const RUN_QTY_RATIO  = 0.25;
+
+// Regime config — MINI: relaxed thresholds (+5 more trades), tighter cooldowns, elevated TP range
+// HOT:  60 (from 65) — aggressive, high-frequency, full risk
+// WARM: 63 (from 68) — balanced, standard risk
+// COLD: 67 (from 72) — selective, reduced risk
+// Counter-trend tax (+5) reduced from +7 for MINI
+const REGIME_CFG = {
+  HOT: {
+    scoreThresh:60, maxPositions:1, riskMult:1.0, cooldownMs:45000,
+    tp1Min:0.018, tp1Max:0.032,
+    runnerEnabled:true, label:'🔥 HOT'
+  },
+  WARM: {
+    scoreThresh:63, maxPositions:1, riskMult:0.82, cooldownMs:75000,
+    tp1Min:0.012, tp1Max:0.022,
+    runnerEnabled:true, label:'🌡 WARM'
+  },
+  COLD: {
+    scoreThresh:67, maxPositions:1, riskMult:0.62, cooldownMs:120000,
+    tp1Min:0.008, tp1Max:0.015,
+    runnerEnabled:false, label:'❄ COLD'
+  },
+};
+function getCfg(){ return REGIME_CFG[S.regime] || REGIME_CFG.COLD; }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADAPTIVE SCORING ENGINE v8 — Dual-Setup Architecture
+// 15M = WHERE to trade + DIRECTION context (never gatekeeper)
+// 5M  = WHEN to trade + EXECUTION trigger (primary engine)
+// 1M  = FINE-TUNE entry timing (confirmation layer)
+//
+// Two setup archetypes:
+//   REVERSAL  — 15M zone + reversal candle + sweep + MSS (highest confidence)
+//   MOMENTUM  — 5M displacement + VWAP/EMA reclaim + volume expansion (high frequency)
+//
+// Execution thresholds:
+//   65+ → VALID    (execute)
+//   80+ → STRONG   (execute + full risk)
+//   90+ → ELITE    (execute + max aggression)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Raw point budget per component (additive, not ratio-weighted)
+// These are MAX points each component can contribute to the score (total pool = 155)
+// Final score is normalised to 0-100.
+const SCORE_POOL = {
+  // 15M CONTEXT LAYER (WHERE + DIRECTION) ——————————————
+  zone15:       15,   // price at 15M S/R zone
+  bias15:       10,   // 15M trend alignment
+  candle15:     10,   // 15M reversal candle (BONUS — not mandatory)
+  // 5M EXECUTION ENGINE (WHEN + TRIGGER) ——————————————
+  mss5:         25,   // 5M market structure shift / MSB
+  sweep5:       20,   // 5M liquidity sweep (key driver)
+  displacement: 15,   // 5M strong displacement candle
+  vwap5:        10,   // VWAP reclaim on 5M
+  // CONFIRMATION LAYER ———————————————————————————————
+  volume:       15,   // volume expansion / spike
+  momentum:     10,   // RSI + 1M momentum
+  atr:          10,   // ATR regime health
+  btc:          10,   // BTC 1M correlation
+  oi:            5,   // open interest flow
+};
+const SCORE_POOL_TOTAL = Object.values(SCORE_POOL).reduce((a,b)=>a+b,0); // 155
+
+function calcAdaptiveScore(raw){
+  // raw = object with same keys as SCORE_POOL, values = 0..1 (fractional achievement)
+  let earned = 0;
+  for(const [k,maxPts] of Object.entries(SCORE_POOL)){
+    earned += maxPts * Math.max(0, Math.min(1, raw[k] || 0));
+  }
+  return Math.round((earned / SCORE_POOL_TOTAL) * 100);
+}
+
+// Execution thresholds
+const EXEC_VALID  = 65;  // minimum to execute
+const EXEC_STRONG = 80;  // full risk allocation
+const EXEC_ELITE  = 90;  // max aggression allowed
+
+// Grade derived from score
+function deriveGrade(score){
+  return score >= EXEC_ELITE ? 'A+' : score >= EXEC_STRONG ? 'A' : 'B';
+}
+
+// ============================================================
+// SECTION B — STATE
+// ============================================================
+let S = {
+  // Connection
+  connected:false, running:false, apiKey:'', apiSecret:'', baseUrl:URLS.mainnet,
+  // Balances
+  balance:0, startBalance:10, totalPnl:0, sessionPnl:0,
+  // Positions / trades
+  trades:[], openPositions:[], wins:0, losses:0,
+  // Loop control
+  isLooping:false, botInterval:null, loopCount:0,
+  tier1Interval:null, tier2Interval:null,
+  // Market state
+  marketSafe:true, btcTrend:'NEUTRAL', btcChange:0, avgFunding:0,
+  // Safety
+  paused:false, pauseReason:'',
+  volatilityBreaker:false,  // Section 12: volatility circuit breaker
+  // Cooldown per coin
+  coinLastTrade:{},
+  // Universe
+  tradableUniverse:[], universeLastBuilt:0,
+  // Tier-1 focus list
+  focusPairs:[],
+  // Regime
+  regime:'COLD', regimeScore:0,
+  // Modal
+  modalTargetSymbol:null,
+};
+
+// ============================================================
+// EXECUTION MUTEX + PENDING EXECUTION REGISTRY
+// Prevents async race conditions from violating MAX_POSITIONS.
+// All order submission must go through acquireExecLock() /
+// releaseExecLock() and register in _pendingExecutions.
+// ============================================================
+let _execLocked  = false;          // binary execution mutex
+let _execQueue   = [];             // waiters for the lock
+const _pendingExecutions = new Set(); // symbols currently in-flight (signal to confirmation)
+
+// Persistent track registry for in-flight orders
+// Prevents duplicate async scanner loops from entering openStructuralTrade
+// for the same symbol simultaneously, before Bybit confirms the first fill.
+const _inFlightOrders = new Set();
+
+// FIX Bug 10: adoption lock — prevents connectAPI() and monitorPositions() from
+// simultaneously adopting the same live Bybit position during the connect sequence.
+let _adoptionLock = false;
+
+// Acquire the execution lock — only one trade can be in-flight at a time.
+// Returns a release function. Must always be called in a try/finally block.
+function acquireExecLock(){
+  return new Promise(resolve=>{
+    if(!_execLocked){
+      _execLocked = true;
+      resolve(()=>{ _execLocked=false; const next=_execQueue.shift(); if(next) next(); });
+    } else {
+      _execQueue.push(()=>{
+        _execLocked = true;
+        resolve(()=>{ _execLocked=false; const next=_execQueue.shift(); if(next) next(); });
+      });
+    }
+  });
+}
+
+// Hard position count — authoritative: confirmed open + currently pending.
+// This is the ONLY number used for cap enforcement.
+function hardPositionCount(){
+  return S.openPositions.length + _pendingExecutions.size;
+}
+
+// Hard slot check — true only when a new position is genuinely allowed.
+function hasOpenSlot(){
+  return hardPositionCount() < MAX_POSITIONS;
+}
+
+// ============================================================
+// SECTION C — PERSISTENT STATE (localStorage)
+// Schema versioned — corrupted state handled gracefully (Fix #5)
+// ============================================================
+const STATE_VERSION = 4; // increment if schema changes
+const STATE_KEY = 'magima_mini_v1_state';
+
+// Daily reset — retained as no-op to avoid breaking any call sites
+let _lastResetDay = new Date().getUTCDate();
+function checkDailyReset(){ _lastResetDay = new Date().getUTCDate(); }
+
+function saveState(){
+  // Section 9: Serialize ALL critical state on every event
+  try{
+    const saved = {
+      _version: STATE_VERSION,
+      _savedAt: Date.now(),
+      trades:           S.trades.slice(0,200),
+      wins:             S.wins,
+      losses:           S.losses,
+      totalPnl:         S.totalPnl,
+      sessionPnl:       S.sessionPnl,
+      paused:           S.paused,
+      pauseReason:      S.pauseReason,
+      volatilityBreaker:S.volatilityBreaker,
+      coinLastTrade:    S.coinLastTrade,
+      regime:           S.regime,
+      regimeScore:      S.regimeScore,
+      startBalance:     S.startBalance,
+      openPositions:    S.openPositions.map(p=>({
+        id:p.id, symbol:p.symbol, side:p.side,
+        entryPrice:p.entryPrice, qty:p.qty, leverage:p.leverage,
+        sl:p.sl, tp:p.tp, tp1Price:p.tp1Price, tp1Pct:p.tp1Pct,
+        slPct:p.slPct, slMethod:p.slMethod,
+        tickSize:p.tickSize||'0.01', qtyStep:p.qtyStep||0.001,
+        openTime:p.openTime, status:p.status, pnl:p.pnl,
+        margin:p.margin, score:p.score, grade:p.grade, setupType:p.setupType,
+        tp1Hit:p.tp1Hit, partialClosed1:p.partialClosed1,
+        runnerActive:p.runnerActive, trailStop:p.trailStop,
+        breakeven:p.breakeven,
+        liqPrice:p.liqPrice, currentPrice:p.currentPrice, atr5:p.atr5,
+        adopted:p.adopted||false
+      })),
+    };
+    localStorage.setItem(STATE_KEY, JSON.stringify(saved));
+    // MINI uses its own key — does not interfere with v9 parent state
+  } catch(e){ console.warn('saveState failed:', e); }
+}
+
+function loadState(){
+  // Section 9: On restart, restore active state and rebuild live positions
+  try{
+    // Try current version first, then fall back to v3
+    let raw = localStorage.getItem(STATE_KEY);
+    if(!raw) return; // MINI has its own clean state — no legacy migration
+
+    let saved;
+    try{
+      saved = JSON.parse(raw);
+    }catch(jsonErr){
+      log('w','↺ Corrupted localStorage — clearing and starting fresh');
+      localStorage.removeItem(STATE_KEY);
+      localStorage.removeItem('magima_v3_state');
+      return;
+    }
+
+    // Schema version check — reject stale incompatible schemas
+    if(saved._version && saved._version < 3){
+      log('w',`↺ Old schema v${saved._version} — clearing incompatible state`);
+      localStorage.removeItem(STATE_KEY);
+      localStorage.removeItem('magima_v3_state');
+      return;
+    }
+
+    // Validate state age — discard states older than 48 hours
+    if(saved._savedAt && (Date.now() - saved._savedAt) > 48 * 60 * 60 * 1000){
+      log('w','↺ State > 48h old — clearing stale persistent state');
+      localStorage.removeItem(STATE_KEY);
+      return;
+    }
+
+    // Safe field recovery with type validation and defaults
+    S.trades              = Array.isArray(saved.trades)            ? saved.trades              : [];
+    S.wins                = Number.isFinite(saved.wins)             ? saved.wins                : 0;
+    S.losses              = Number.isFinite(saved.losses)           ? saved.losses              : 0;
+    S.totalPnl            = Number.isFinite(saved.totalPnl)         ? saved.totalPnl            : 0;
+    S.sessionPnl          = Number.isFinite(saved.sessionPnl)       ? saved.sessionPnl          : 0;
+    S.paused              = !!saved.paused;
+    S.pauseReason         = typeof saved.pauseReason === 'string'    ? saved.pauseReason         : '';
+    S.volatilityBreaker   = !!saved.volatilityBreaker;
+    S.coinLastTrade       = (saved.coinLastTrade && typeof saved.coinLastTrade === 'object') ? saved.coinLastTrade : {};
+    if(saved.regime && ['HOT','WARM','COLD'].includes(saved.regime)) S.regime = saved.regime;
+    if(Number.isFinite(saved.regimeScore)) S.regimeScore = saved.regimeScore;
+    if(Number.isFinite(saved.startBalance) && saved.startBalance > 0) S.startBalance = saved.startBalance;
+
+    // Prune expired cooldowns older than 24h
+    const now = Date.now();
+    for(const [sym, ts] of Object.entries(S.coinLastTrade)){
+      const elapsed = now - ts;
+      if(elapsed > 0 && elapsed > 24 * 60 * 60 * 1000) delete S.coinLastTrade[sym];
+    }
+
+    // Restore open positions with validation
+    if(Array.isArray(saved.openPositions)){
+      S.openPositions = saved.openPositions.filter(p=>{
+        // Validate required fields exist and are sensible
+        return p && p.symbol && p.side && p.entryPrice > 0 && p.qty > 0 && p.status === 'open';
+      });
+      log('i',`↺ Restored ${S.openPositions.length} open position(s) from persistent state`);
+    }
+    log('i','↺ Persistent state fully restored — trade management resuming seamlessly');
+  } catch(e){
+    log('e','loadState error: '+e.message+' — clearing corrupted state');
+    try{ localStorage.removeItem(STATE_KEY); localStorage.removeItem('magima_v3_state'); }catch(_){}
+  }
+}
+
+// ============================================================
+// SECTION D — BYBIT API (signed, rate-limit safe, mutex-protected)
+// ============================================================
+
+// Candle cache — prevents redundant kline fetching (Fix #3)
+const _klineCache = new Map();
+const KLINE_CACHE_TTL = { '1': 8000, '5': 18000, '15': 45000, '60': 90000, '240': 300000 };
+async function pubCached(path){
+  // Extract interval from URL for TTL
+  const intervalMatch = path.match(/interval=(\d+)/);
+  const interval = intervalMatch ? intervalMatch[1] : '15';
+  const ttl = KLINE_CACHE_TTL[interval] || 15000;
+  const now = Date.now();
+  if(_klineCache.has(path)){
+    const { data, ts } = _klineCache.get(path);
+    if(now - ts < ttl) return data;
+  }
+  const data = await pub(path);
+  if(data?.result?.list?.length) _klineCache.set(path, { data, ts: now });
+  // Prune cache if oversized
+  if(_klineCache.size > 400){
+    const oldest = [..._klineCache.entries()].sort((a,b)=>a[1].ts-b[1].ts).slice(0,100);
+    oldest.forEach(([k])=>_klineCache.delete(k));
+  }
+  return data;
+}
+
+// API queue with adaptive delay and timeout (Fix #3)
+const _apiQueue = [];
+let _apiRunning = false;
+let _apiStressLevel = 0; // 0 = normal, 1 = stressed, 2 = very stressed
+
+async function _drainQueue(){
+  if(_apiRunning || !_apiQueue.length) return;
+  _apiRunning = true;
+  while(_apiQueue.length){
+    const {method,endpoint,params,resolve,reject,deadline} = _apiQueue.shift();
+    // Check timeout before executing
+    if(deadline && Date.now() > deadline){
+      reject(new Error('API request timed out in queue')); continue;
+    }
+    try{
+      resolve(await _apiRaw(method,endpoint,params));
+      // Reduce stress on success
+      if(_apiStressLevel > 0) _apiStressLevel = Math.max(0, _apiStressLevel - 1);
+    }catch(e){
+      // Increase stress on error — adaptive back-off
+      _apiStressLevel = Math.min(3, _apiStressLevel + 1);
+      reject(e);
+    }
+    // Adaptive delay: normal=55ms, stressed=120ms, very stressed=300ms
+    const delay = _apiStressLevel === 0 ? 55 : _apiStressLevel === 1 ? 120 : _apiStressLevel >= 2 ? 300 : 55;
+    await sleep(delay);
+  }
+  _apiRunning = false;
+}
+function api(method, endpoint, params={}){
+  return new Promise((resolve, reject)=>{
+    // FIX Bug 13: deadline raised to 30s to safely cover the 25s fill-poll loop.
+    // Previously 12s caused poll requests to time out mid-fill-check, causing
+    // the bot to cancel orders that had actually filled on Bybit.
+    const deadline = Date.now() + 30000;
+    _apiQueue.push({method, endpoint, params, resolve, reject, deadline});
+    _drainQueue();
+  });
+}
+async function _apiRaw(method, endpoint, params={}){
+  const ts   = Date.now().toString();
+  const recv = '5000';
+  let ps='', body='';
+  if(method==='GET') ps = new URLSearchParams(params).toString();
+  else{ body = JSON.stringify(params); ps = body; }
+  const sig = await sign(S.apiSecret, ts + S.apiKey + recv + ps);
+  const h = {
+    'X-BAPI-API-KEY':S.apiKey,'X-BAPI-TIMESTAMP':ts,
+    'X-BAPI-SIGN':sig,'X-BAPI-RECV-WINDOW':recv,'Content-Type':'application/json'
+  };
+  let url = S.baseUrl + endpoint;
+  if(method==='GET' && ps) url += '?'+ps;
+  const r = await fetch(url,{method,headers:h,body:method!=='GET'?body:undefined});
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+async function sign(secret, msg){
+  const e = new TextEncoder();
+  const k = await crypto.subtle.importKey('raw',e.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  const s = await crypto.subtle.sign('HMAC',k,e.encode(msg));
+  return Array.from(new Uint8Array(s)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// Public endpoints (no signing needed)
+async function pub(path){
+  try{
+    const r = await fetch(S.baseUrl+path);
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  }catch(e){
+    // FIX Bug 15: do not log here — callers that catch this will log contextually.
+    // Logging here AND in the caller produced duplicate red console entries.
+    throw e;
+  }
+}
+
+// ============================================================
+// CROSS MARGIN — UTA-SAFE (no margin-mode switching)
+// Account is manually configured for CROSS margin.
+// Bybit Unified Trading Accounts (UTA) forbid margin-mode API
+// calls — all switchCrossIsolated / switch-isolated logic removed.
+// The execution engine assumes CROSS is already active and valid.
+// ============================================================
+const _crossMarginSet = new Set(); // retained for clearAll() compatibility only
+// enforceCrossMargin: UTA-safe no-op — never calls switch-isolated or any
+// margin-mode API. Simply logs that CROSS margin is assumed active and returns true.
+async function enforceCrossMargin(symbol){
+  // No margin-mode switching — UTA accounts forbid it and it is not needed.
+  // Account is pre-configured as CROSS. Mark confirmed and continue.
+  _crossMarginSet.add(symbol);
+  log('i',`EXECUTION READY  Symbol: ${symbol}  Margin Mode: CROSS (existing)  — no API switch needed (UTA-safe)`);
+  return true;
+}
+
+// ============================================================
+// SECTION E — UTILITIES
+// ============================================================
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function log(type,msg){
+  const c=document.getElementById('console');
+  const ts=new Date().toTimeString().slice(0,8);
+  const cls={i:'ci',s:'cs',w:'cw',e:'ce',t:'ct',tr:'ctr',p:'cp'}[type]||'ct';
+  const div=document.createElement('div'); div.className='cl';
+  div.innerHTML=`<span class="ct">[${ts}]</span> <span class="${cls}">${msg}</span>`;
+  c.appendChild(div);
+  while(c.children.length>200) c.removeChild(c.firstChild);
+  c.scrollTop=c.scrollHeight;
+}
+
+function getSessionInfo(){
+  const now=new Date(); const u=now.getUTCHours()*60+now.getUTCMinutes();
+  const min=now.getUTCMinutes();
+  const nearHourlyClose = min>=58 || min<=1;
+  const nearDailyClose  = (now.getUTCHours()===23&&min>=58)||(now.getUTCHours()===0&&min<=1);
+  const dangerous = nearHourlyClose || nearDailyClose;
+  let session;
+  if(u>=780&&u<960)  session={name:'LON+NY', quality:'PRIME', score:2};
+  else if(u>=420&&u<780) session={name:'LONDON', quality:'GOOD', score:1};
+  else if(u>=960&&u<1260) session={name:'NEW YORK', quality:'GOOD', score:1};
+  else session={name:'ASIA/OFF', quality:'LOW', score:0};
+  return{...session, dangerous, nearHourlyClose, nearDailyClose};
+}
+
+// Per-coin cooldown
+function isCoolingDown(sym){
+  const l=S.coinLastTrade[sym]; const cfg=getCfg();
+  if(!l) return false;
+  const elapsed = Date.now() - l;
+  return elapsed < cfg.cooldownMs;
+}
+function setCooldown(sym){ S.coinLastTrade[sym]=Date.now(); }
+
+// Correlation guard: max 1 position per direction
+function isCorrelationBlocked(direction){
+  return S.openPositions.filter(p=>p.side===direction).length >= 1;
+}
+
+// ============================================================
+// SECTION F — TECHNICAL INDICATORS
+// (Fully preserved + extended from v2)
+// ============================================================
+function calcRSI(c,p=14){
+  if(c.length<p+1) return 50;
+  let g=0,l=0;
+  for(let i=c.length-p;i<c.length;i++){const d=c[i]-c[i-1];if(d>0)g+=d;else l+=Math.abs(d);}
+  const ag=g/p, al=l/p; return al===0?100:100-(100/(1+ag/al));
+}
+function calcEMA(prices,period){
+  if(prices.length<period) return prices[prices.length-1]||0;
+  const k=2/(period+1); let e=prices.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  for(let i=period;i<prices.length;i++) e=prices[i]*k+e*(1-k);
+  return e;
+}
+function calcEMAFull(prices,period){
+  if(prices.length<period) return prices.map(()=>prices[0]||0);
+  const k=2/(period+1); const result=[];
+  let seed=prices.slice(0,period).reduce((a,b)=>a+b,0)/period; result.push(seed);
+  for(let i=period;i<prices.length;i++){ seed=prices[i]*k+seed*(1-k); result.push(seed); }
+  return result;
+}
+function calcMACD(closes){
+  if(closes.length<35) return{macd:0,signal:0,histogram:0};
+  const e12=calcEMAFull(closes,12), e26=calcEMAFull(closes,26);
+  const diff=e12.length-e26.length;
+  const ml=e26.map((v,i)=>e12[i+diff]-v);
+  if(ml.length<9) return{macd:0,signal:0,histogram:0};
+  const sig=calcEMAFull(ml,9);
+  const last=ml[ml.length-1], s=sig[sig.length-1];
+  return{macd:last,signal:isNaN(s)?0:s,histogram:last-(isNaN(s)?0:s)};
+}
+function calcStochRSI(closes,period=14,smooth=3){
+  const rv=[];
+  for(let i=period;i<=closes.length;i++) rv.push(calcRSI(closes.slice(i-period,i),period));
+  if(rv.length<period+smooth) return{k:50,d:50};
+  const sv=[];
+  for(let i=period;i<=rv.length;i++){
+    const sl=rv.slice(i-period,i), mn=Math.min(...sl), mx=Math.max(...sl);
+    sv.push(mx===mn?50:(rv[i-1]-mn)/(mx-mn)*100);
+  }
+  if(sv.length<smooth) return{k:sv[sv.length-1]||50,d:50};
+  const kv=[];
+  for(let i=smooth-1;i<sv.length;i++) kv.push(sv.slice(i-smooth+1,i+1).reduce((a,b)=>a+b,0)/smooth);
+  const k=kv[kv.length-1], d=kv.slice(-smooth).reduce((a,b)=>a+b,0)/smooth;
+  return{k:isNaN(k)?50:k, d:isNaN(d)?50:d};
+}
+function calcATR(klines,p=14){
+  const t=[];
+  for(let i=1;i<Math.min(klines.length,p+2);i++){
+    const h=parseFloat(klines[i][2]),l=parseFloat(klines[i][3]),pc=parseFloat(klines[i-1][4]);
+    t.push(Math.max(h-l,Math.abs(h-pc),Math.abs(l-pc)));
+  }
+  return t.length>0 ? t.reduce((a,b)=>a+b,0)/t.length : 0;
+}
+function calcVWAP(klines){
+  let tpv=0,vol=0;
+  for(const k of klines.slice(-40)){
+    const tp=(parseFloat(k[2])+parseFloat(k[3])+parseFloat(k[4]))/3, v=parseFloat(k[5]);
+    tpv+=tp*v; vol+=v;
+  }
+  return vol>0 ? tpv/vol : parseFloat(klines[klines.length-1][4]);
+}
+
+// ============================================================
+// SECTION G — CANDLE PATTERN RECOGNITION
+// High-velocity structural stabilization check.
+// Confirms the asset is absorbing pressure at the 15M boundary early —
+// without waiting for textbook-perfect closes that cause late entries.
+// LONG  passes if: closed positive (cc >= co) OR lower absorption wick >= 35% of range.
+// SHORT passes if: closed negative (cc <= co) OR upper selling wick >= 35% of range.
+// ============================================================
+function detectReversalCandle(klines, direction){
+  if(klines.length < 2) return false;
+  const c = klines[klines.length - 1];
+  const co = parseFloat(c[1]), ch = parseFloat(c[2]), cl = parseFloat(c[3]), cc = parseFloat(c[4]);
+  const range = ch - cl;
+  if(range === 0) return true; // flat doji at zone = full absorption, always valid
+
+  const upperWick = ch - Math.max(co, cc);
+  const lowerWick = Math.min(co, cc) - cl;
+
+  if(direction === 'LONG'){
+    return (cc >= co) || (lowerWick >= range * 0.35);
+  } else {
+    return (cc <= co) || (upperWick >= range * 0.35);
+  }
+}
+
+// Generic candle direction (unchanged from v2)
+function calcCandles(klines){
+  if(klines.length<3) return 'NEUTRAL';
+  const c=klines[klines.length-1],p=klines[klines.length-2],pp=klines[klines.length-3];
+  const co=parseFloat(c[1]),ch=parseFloat(c[2]),cl=parseFloat(c[3]),cc=parseFloat(c[4]);
+  const po=parseFloat(p[1]),ph=parseFloat(p[2]),pl=parseFloat(p[3]),pc=parseFloat(p[4]);
+  const ppo=parseFloat(pp[1]),ppc=parseFloat(pp[4]);
+  const body=Math.abs(cc-co),range=ch-cl,pbody=Math.abs(pc-po),prange=ph-pl;
+  if(range===0) return 'NEUTRAL';
+  const uw=ch-Math.max(co,cc),lw=Math.min(co,cc)-cl;
+  if(cc>co&&pc<po&&co<=pc&&cc>=po&&body>pbody*0.8) return 'BULL';
+  if(lw>body*2&&uw<body*0.5&&range>0&&cc>co) return 'BULL';
+  if(lw>range*0.6&&body<range*0.1) return 'BULL';
+  if(ppc<ppo&&pbody<prange*0.3&&cc>co&&cc>(ppo+ppc)/2) return 'BULL';
+  if(cc>co&&pc>po&&ppc>ppo&&cc>pc&&pc>ppc) return 'BULL';
+  if(pc<po&&cc>co&&cc>(po+pc)/2&&co<pc) return 'BULL';
+  if(cc<co&&pc>po&&co>=pc&&cc<=po&&body>pbody*0.8) return 'BEAR';
+  if(uw>body*2&&lw<body*0.5&&range>0&&cc<co) return 'BEAR';
+  if(uw>range*0.6&&body<range*0.1) return 'BEAR';
+  if(ppc>ppo&&pbody<prange*0.3&&cc<co&&cc<(ppo+ppc)/2) return 'BEAR';
+  if(cc<co&&pc<po&&ppc<ppo&&cc<pc&&pc<ppc) return 'BEAR';
+  if(pc>po&&cc<co&&cc<(po+pc)/2&&co>pc) return 'BEAR';
+  return 'NEUTRAL';
+}
+
+// ============================================================
+// SECTION H — STRUCTURAL ZONE DETECTION
+// ============================================================
+
+// Find 15M swing highs and lows using lookback pivots
+function find15MZones(klines){
+  if(klines.length<20) return { supports:[], resistances:[] };
+  const highs=klines.map(k=>parseFloat(k[2]));
+  const lows=klines.map(k=>parseFloat(k[3]));
+  const resistances=[], supports=[];
+  for(let i=3;i<highs.length-3;i++){
+    if(highs[i]>highs[i-1]&&highs[i]>highs[i-2]&&highs[i]>highs[i+1]&&highs[i]>highs[i+2])
+      resistances.push(highs[i]);
+    if(lows[i]<lows[i-1]&&lows[i]<lows[i-2]&&lows[i]<lows[i+1]&&lows[i]<lows[i+2])
+      supports.push(lows[i]);
+  }
+  return { supports: supports.slice(-6), resistances: resistances.slice(-6) };
+}
+
+// Check if price is interacting with a 15M structural zone
+// Interaction = price within ATR*0.6 of nearest S or R
+function priceAtStructuralZone(price, zones, atr15){
+  const margin = atr15 * 0.65;
+  const nearSupport = zones.supports.some(s => Math.abs(price-s) <= margin && price >= s*0.995);
+  const nearResistance = zones.resistances.some(r => Math.abs(price-r) <= margin && price <= r*1.005);
+  return { nearSupport, nearResistance };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STRUCTURAL STOP LOSS — GAP ANCHOR METHOD
+//
+// Concept: The 1H support and 4H support define a structural gap.
+// The SL is placed 25% of the way down that gap FROM the 1H support level.
+//
+// LONG:
+//   1H support = lowest low of recent 1H candles (below price)
+//   4H support = lowest low of recent 4H candles (below 1H support)
+//   gap        = 1H_support - 4H_support
+//   SL         = 1H_support - (gap × 0.25)
+//
+// SHORT (mirror):
+//   1H resistance = highest high of recent 1H candles (above price)
+//   4H resistance = highest high of recent 4H candles (above 1H resistance)
+//   gap            = 4H_resistance - 1H_resistance
+//   SL             = 1H_resistance + (gap × 0.25)
+//
+// This places the SL comfortably below 1H structure but well above the
+// deeper 4H macro level — insulated from noise, not from trend.
+// ─────────────────────────────────────────────────────────────────────────────
+function calc4HStructuralSL(k1h, k4h, direction, price){
+  if(!k1h || k1h.length < 5) return null;
+
+  if(direction === 'LONG'){
+    // ── LONG: find 1H support and 4H support ──
+    const lows1h = k1h.slice(-15).map(k => parseFloat(k[3]));
+    const support1H = Math.min(...lows1h.filter(l => l < price * 0.9995));
+    if(!isFinite(support1H) || support1H <= 0) return null;
+
+    // 4H support: use 4H lows if available, else fall back to deeper 1H lows
+    let support4H;
+    if(k4h && k4h.length >= 3){
+      const lows4h = k4h.slice(-10).map(k => parseFloat(k[3]));
+      const candidates4h = lows4h.filter(l => l < support1H * 0.9995);
+      support4H = candidates4h.length > 0 ? Math.min(...candidates4h) : support1H * 0.975;
+    } else {
+      // No 4H data — synthesise a 4H anchor 2.5% below 1H support
+      support4H = support1H * 0.975;
+    }
+
+    // Gap between 1H and 4H support levels
+    const gap    = support1H - support4H;
+    if(gap <= 0) return null; // 4H must be genuinely below 1H
+
+    // SL = 25% down into the gap from 1H support
+    const slPrice = support1H - (gap * 0.25);
+    const slPct   = (price - slPrice) / price;
+
+    // Safety bounds: SL must be below entry and not unreasonably far
+    if(slPct <= 0.002 || slPct > 0.25) return null;
+    return { slPrice, slPct, method:'1H-4H-GAP-25PCT', support1H, support4H, gap };
+
+  } else {
+    // ── SHORT: find 1H resistance and 4H resistance ──
+    const highs1h = k1h.slice(-15).map(k => parseFloat(k[2]));
+    const resist1H = Math.max(...highs1h.filter(h => h > price * 1.0005));
+    if(!isFinite(resist1H) || resist1H <= 0) return null;
+
+    // 4H resistance: use 4H highs if available, else fall back
+    let resist4H;
+    if(k4h && k4h.length >= 3){
+      const highs4h = k4h.slice(-10).map(k => parseFloat(k[2]));
+      const candidates4h = highs4h.filter(h => h > resist1H * 1.0005);
+      resist4H = candidates4h.length > 0 ? Math.max(...candidates4h) : resist1H * 1.025;
+    } else {
+      resist4H = resist1H * 1.025;
+    }
+
+    const gap    = resist4H - resist1H;
+    if(gap <= 0) return null;
+
+    // SL = 25% up into the gap from 1H resistance
+    const slPrice = resist1H + (gap * 0.25);
+    const slPct   = (slPrice - price) / price;
+
+    if(slPct <= 0.002 || slPct > 0.25) return null;
+    return { slPrice, slPct, method:'1H-4H-GAP-25PCT', resist1H, resist4H, gap };
+  }
+}
+
+// ============================================================
+// SECTION I — 5M MARKET STRUCTURE BREAK
+// Compressed lookback=4 for faster MSB confirmation without chasing
+// ============================================================
+function detect5MMSB(k5c, direction, lookback=4){
+  if(k5c.length < lookback + 3) return false;
+
+  const window = k5c.slice(-lookback - 3, -1);
+  const lastCandle = k5c[k5c.length - 1];
+  const lastClose = parseFloat(lastCandle[4]);
+
+  if(direction === 'LONG'){
+    return lastClose > Math.max(...window.map(k=>parseFloat(k[2])));
+  } else {
+    return lastClose < Math.min(...window.map(k=>parseFloat(k[3])));
+  }
+}
+
+// ============================================================
+// SECTION J — 1M PULLBACK DETECTION
+// Balanced execution version — natural micro-pullback at VWAP/EMA/volume exhaustion.
+// Pullback detection uses candle body direction (close vs open) for naturalness.
+// VWAP tolerance widened to 0.6%, EMA to 0.45%, volExhausting allows +10% buffer.
+// ============================================================
+function detect1MPullback(k1c, direction, vwap1, ema5on1){
+  if(k1c.length < 8) return { valid:false };
+
+  const closes = k1c.map(k=>parseFloat(k[4]));
+  const opens  = k1c.map(k=>parseFloat(k[1]));
+
+  const price = closes[closes.length-1];
+  const prev  = closes[closes.length-2];
+
+  // Trigger candle must confirm execution direction
+  const triggerBull = price > prev;
+  const triggerBear = price < prev;
+
+  if(direction==='LONG'  && !triggerBull) return { valid:false };
+  if(direction==='SHORT' && !triggerBear) return { valid:false };
+
+  // Natural micro pullback: any recent 1M candle closed against direction
+  const recentBars = k1c.slice(-6, -1);
+  const hadPullback = direction==='LONG'
+    ? recentBars.some(k => parseFloat(k[4]) <= parseFloat(k[1]))  // any bearish candle
+    : recentBars.some(k => parseFloat(k[4]) >= parseFloat(k[1])); // any bullish candle
+
+  // Balanced proximity filters (widened from strict 0.4%/0.3%)
+  const nearVwap = Math.abs(price - vwap1)/price < 0.006;
+
+  const nearEma = ema5on1 > 0 && Math.abs(price - ema5on1)/price < 0.0045;
+
+  // Volume exhaustion: current vol not more than 10% above prior (replaces strict decline)
+  const vols = k1c.slice(-5).map(k=>parseFloat(k[5]));
+  const volExhausting = vols.length >= 2 &&
+    vols[vols.length-1] <= vols[vols.length-2] * 1.10;
+
+  const valid = hadPullback && (nearVwap || nearEma || volExhausting);
+
+  return { valid, nearVwap, nearEma, hadPullback, volExhausting };
+}
+
+// ============================================================
+// SECTION K — VOLATILITY / REGIME
+// ============================================================
+function calcVolumeSignal(klines,direction){
+  if(klines.length<12) return{spike:false,trend:'NEUTRAL',divergence:false,score:0,ratio:1};
+  const vols=klines.slice(-11).map(k=>parseFloat(k[5]));
+  const closes=klines.slice(-11).map(k=>parseFloat(k[4]));
+  const avgVol=vols.slice(0,10).reduce((a,b)=>a+b,0)/10;
+  const curVol=vols[vols.length-1];
+  const ratio=avgVol>0?curVol/avgVol:1;
+  const spike=ratio>=1.15;
+  const last3v=vols.slice(-3);
+  const volTrendUp=last3v[2]>last3v[1]&&last3v[1]>last3v[0];
+  const volTrendDown=last3v[2]<last3v[1]&&last3v[1]<last3v[0];
+  const last3c=closes.slice(-3);
+  const priceUp=last3c[2]>last3c[0]; const priceDown=last3c[2]<last3c[0];
+  const divergence=(priceUp&&volTrendDown)||(priceDown&&volTrendUp);
+  const trend=volTrendUp?'UP':volTrendDown?'DOWN':'FLAT';
+  let score=0;
+  if(spike)score+=2;
+  if(direction==='LONG'&&volTrendUp)score+=1;
+  if(direction==='SHORT'&&volTrendDown)score+=1;
+  if(!divergence)score+=1;
+  return{spike,trend,divergence,avgVol,curVol,score,ratio};
+}
+
+// ============================================================
+// SECTION I-b — EXPANDED 5M EXECUTION DETECTORS
+// These replace the single MSB check with a rich multi-signal 5M engine.
+// Each function returns a structured result for use in scoring.
+// ============================================================
+
+// 5M LIQUIDITY SWEEP
+// Detects a wick below recent support (for LONG) or above recent resistance (for SHORT)
+// followed by a recovery — classic stop-hunt / liquidity grab pattern.
+function detect5MLiqSweep(k5c, direction){
+  if(k5c.length < 10) return { swept:false, sweepDepth:0 };
+  const recent = k5c.slice(-8);
+  const last   = k5c[k5c.length - 1];
+  const lastLow  = parseFloat(last[3]);
+  const lastHigh = parseFloat(last[2]);
+  const lastClose= parseFloat(last[4]);
+
+  if(direction === 'LONG'){
+    // Sweep: wick dipped below recent lows but closed back above
+    const prevLows = recent.slice(0,-1).map(k=>parseFloat(k[3]));
+    const recentSupport = Math.min(...prevLows);
+    const swept = lastLow < recentSupport && lastClose > recentSupport;
+    const sweepDepth = swept ? (recentSupport - lastLow) / recentSupport : 0;
+    return { swept, sweepDepth, recentSupport };
+  } else {
+    // Sweep: wick spiked above recent highs but closed back below
+    const prevHighs = recent.slice(0,-1).map(k=>parseFloat(k[2]));
+    const recentResist = Math.max(...prevHighs);
+    const swept = lastHigh > recentResist && lastClose < recentResist;
+    const sweepDepth = swept ? (lastHigh - recentResist) / recentResist : 0;
+    return { swept, sweepDepth, recentResist };
+  }
+}
+
+// 5M DISPLACEMENT CANDLE
+// Detects a strong impulsive candle: large body relative to range, in trade direction.
+// This is the "smart money" entry signal — explosive displacement after sweep/MSS.
+function detect5MDisplacement(k5c, direction){
+  if(k5c.length < 5) return { displaced:false, strength:0 };
+  // Check last 3 candles for a displacement move
+  const lookback = k5c.slice(-4);
+  let bestStrength = 0;
+  let displaced = false;
+  for(const c of lookback){
+    const co = parseFloat(c[1]), ch = parseFloat(c[2]), cl = parseFloat(c[3]), cc = parseFloat(c[4]);
+    const body  = Math.abs(cc - co);
+    const range = ch - cl;
+    if(range === 0) continue;
+    const bodyRatio = body / range;     // 1.0 = pure body candle, 0 = pure wick
+    const isBull = cc > co;
+    const isBear = cc < co;
+    const aligned = (direction === 'LONG' && isBull) || (direction === 'SHORT' && isBear);
+    if(aligned && bodyRatio > 0.55){
+      displaced = true;
+      bestStrength = Math.max(bestStrength, bodyRatio);
+    }
+  }
+  return { displaced, strength: bestStrength };
+}
+
+// 5M VWAP RECLAIM
+// After a sweep below (LONG) or above (SHORT) VWAP, price closes back through it.
+// High-probability signal: institutions defend the VWAP level.
+function detect5MVwapReclaim(k5c, direction, vwap5){
+  if(k5c.length < 5 || !vwap5) return { reclaimed:false };
+  const last2 = k5c.slice(-3);
+  const prev  = last2[last2.length - 2];
+  const curr  = last2[last2.length - 1];
+  const prevClose = parseFloat(prev[4]);
+  const currClose = parseFloat(curr[4]);
+  if(direction === 'LONG'){
+    // Price was below VWAP, now closes above = reclaim
+    const reclaimed = prevClose < vwap5 && currClose > vwap5;
+    const marginPct = reclaimed ? (currClose - vwap5) / vwap5 : 0;
+    return { reclaimed, marginPct };
+  } else {
+    // Price was above VWAP, now closes below = reclaim bearish
+    const reclaimed = prevClose > vwap5 && currClose < vwap5;
+    const marginPct = reclaimed ? (vwap5 - currClose) / vwap5 : 0;
+    return { reclaimed, marginPct };
+  }
+}
+
+// 5M EMA RECLAIM (21 EMA)
+// After a dip below (LONG) or pop above (SHORT) the 21 EMA, price closes back through.
+// Continuation setup off dynamic support.
+function detect5MEmaReclaim(k5c, direction, ema21on5){
+  if(k5c.length < 5 || !ema21on5) return { reclaimed:false };
+  const prev  = k5c[k5c.length - 2];
+  const curr  = k5c[k5c.length - 1];
+  const prevClose = parseFloat(prev[4]);
+  const currClose = parseFloat(curr[4]);
+  if(direction === 'LONG'){
+    const reclaimed = prevClose < ema21on5 && currClose > ema21on5;
+    return { reclaimed, diff: currClose - ema21on5 };
+  } else {
+    const reclaimed = prevClose > ema21on5 && currClose < ema21on5;
+    return { reclaimed, diff: ema21on5 - currClose };
+  }
+}
+
+// 5M VOLUME EXPANSION
+// Volume on trigger candle must be meaningfully above recent average.
+// Confirms institutional participation — avoids false breakouts.
+function detect5MVolumeExpansion(k5c){
+  if(k5c.length < 8) return { expanding:false, ratio:1.0 };
+  const vols    = k5c.slice(-8).map(k=>parseFloat(k[5]));
+  const avgVol  = vols.slice(0, -1).reduce((a,b)=>a+b,0) / (vols.length - 1);
+  const curVol  = vols[vols.length - 1];
+  const ratio   = avgVol > 0 ? curVol / avgVol : 1;
+  // Expanding = current volume > 1.3x average (30% above)
+  const expanding = ratio >= 1.3;
+  const strong    = ratio >= 2.0;  // 2x = very strong
+  return { expanding, strong, ratio };
+}
+
+// 5M MARKET STRUCTURE SHIFT (enhanced — detects MSS not just MSB)
+// MSB = close above prior swing high (aggressive, early)
+// MSS = structural shift confirmed with HL formation (conservative, higher quality)
+function detect5MStructureShift(k5c, direction){
+  if(k5c.length < 10) return { msb:false, mss:false, quality:0 };
+
+  const lastClose = parseFloat(k5c[k5c.length-1][4]);
+
+  // MSB: close beyond prior 4-candle swing
+  const window4 = k5c.slice(-6, -1);
+  const msb = direction === 'LONG'
+    ? lastClose > Math.max(...window4.map(k=>parseFloat(k[2])))
+    : lastClose < Math.min(...window4.map(k=>parseFloat(k[3])));
+
+  // MSS: also requires a higher low (LONG) or lower high (SHORT) before the break
+  let mss = false;
+  if(msb && k5c.length >= 12){
+    const older = k5c.slice(-12, -5);
+    if(direction === 'LONG'){
+      const recentLows  = k5c.slice(-6,-1).map(k=>parseFloat(k[3]));
+      const olderLows   = older.map(k=>parseFloat(k[3]));
+      const recentMinLow = Math.min(...recentLows);
+      const olderMinLow  = Math.min(...olderLows);
+      mss = recentMinLow > olderMinLow; // higher low = valid MSS
+    } else {
+      const recentHighs  = k5c.slice(-6,-1).map(k=>parseFloat(k[2]));
+      const olderHighs   = older.map(k=>parseFloat(k[2]));
+      const recentMaxHigh = Math.max(...recentHighs);
+      const olderMaxHigh  = Math.max(...olderHighs);
+      mss = recentMaxHigh < olderMaxHigh; // lower high = valid MSS
+    }
+  }
+
+  const quality = mss ? 1.0 : msb ? 0.65 : 0;
+  return { msb, mss, quality };
+}
+
+// BTC CORRELATION SCORE (0..1)
+// Returns a scored value instead of hard-reject
+async function scoreBtcCorrelation(direction){
+  try{
+    const btcK = await pub('/v5/market/kline?category=linear&symbol=BTCUSDT&interval=1&limit=8');
+    const btcC = (btcK.result?.list||[]).reverse().map(x=>parseFloat(x[4]));
+    if(btcC.length < 5) return 0.5; // neutral if no data
+    const btcDir     = btcC[btcC.length-1] > btcC[btcC.length-5] ? 'UP' : 'DOWN';
+    const btcMovePct = Math.abs((btcC[btcC.length-1]-btcC[btcC.length-5])/btcC[btcC.length-5])*100;
+    const aligned    = (direction==='LONG' && btcDir==='UP') || (direction==='SHORT' && btcDir==='DOWN');
+    const opposing   = (direction==='LONG' && btcDir==='DOWN') || (direction==='SHORT' && btcDir==='UP');
+    if(aligned)                          return btcMovePct > 0.15 ? 1.0 : 0.75;
+    if(opposing && btcMovePct > 0.35)    return 0.1;  // strong opposition — heavily penalise
+    if(opposing && btcMovePct > 0.20)    return 0.3;  // moderate opposition
+    return 0.5; // weak/flat BTC = neutral
+  }catch(e){ return 0.5; }
+}
+
+function isConsolidating(closes,period=10){
+  if(closes.length<period) return false;
+  const sl=closes.slice(-period);
+  const hi=Math.max(...sl), lo=Math.min(...sl);
+  return lo>0 && (hi-lo)/lo < 0.004;
+}
+function isDeadVolume(klines,period=8){
+  if(klines.length<period) return false;
+  const vols=klines.slice(-period).map(k=>parseFloat(k[5]));
+  const avg20=klines.slice(-20).map(k=>parseFloat(k[5])).reduce((a,b)=>a+b,0)/20;
+  const recentAvg=vols.reduce((a,b)=>a+b,0)/vols.length;
+  return avg20>0 && recentAvg<avg20*0.35;
+}
+
+function tfBias(klines){
+  if(klines.length<10) return 'NEUTRAL';
+  const c=klines.map(x=>parseFloat(x[4]));
+  const highs=klines.map(x=>parseFloat(x[2]));
+  const lows=klines.map(x=>parseFloat(x[3]));
+  function findPivots(arr,type){
+    const pivots=[];
+    for(let i=2;i<arr.length-2;i++){
+      if(type==='high'&&arr[i]>arr[i-1]&&arr[i]>arr[i-2]&&arr[i]>arr[i+1]&&arr[i]>arr[i+2]) pivots.push(arr[i]);
+      if(type==='low'&&arr[i]<arr[i-1]&&arr[i]<arr[i-2]&&arr[i]<arr[i+1]&&arr[i]<arr[i+2]) pivots.push(arr[i]);
+    }
+    return pivots.slice(-4);
+  }
+  const pH=findPivots(highs,'high'), pL=findPivots(lows,'low');
+  const hasHH=pH.length>=2&&pH[pH.length-1]>pH[pH.length-2];
+  const hasHL=pL.length>=2&&pL[pL.length-1]>pL[pL.length-2];
+  const hasLH=pH.length>=2&&pH[pH.length-1]<pH[pH.length-2];
+  const hasLL=pL.length>=2&&pL[pL.length-1]<pL[pL.length-2];
+  const pivotBull=(hasHH&&hasHL)?1:0, pivotBear=(hasLH&&hasLL)?1:0;
+  const e9now=calcEMA(c.slice(-14),9), e9prev=calcEMA(c.slice(-17,-3),9), e21=calcEMA(c.slice(-28),21);
+  const emaBull=(e9now>e9prev&&e9now>e21)?1:0, emaBear=(e9now<e9prev&&e9now<e21)?1:0;
+  const rsiVal=calcRSI(c,14);
+  const candleSig=calcCandles(klines.slice(-3));
+  const bull=pivotBull+emaBull+(rsiVal>52?1:0)+(candleSig==='BULL'?1:0)+(c[c.length-1]>e21?1:0);
+  const bear=pivotBear+emaBear+(rsiVal<48?1:0)+(candleSig==='BEAR'?1:0)+(c[c.length-1]<e21?1:0);
+  if(bull>=3&&bull>bear) return 'BULL';
+  if(bear>=3&&bear>bull) return 'BEAR';
+  return 'NEUTRAL';
+}
+
+// ============================================================
+// SECTION L — EXECUTION SAFETY CHECKS
+// ============================================================
+async function checkSpread(symbol,price){
+  try{
+    const ob=await pub(`/v5/market/orderbook?category=linear&symbol=${symbol}&limit=1`);
+    const bid=parseFloat(ob.result?.b?.[0]?.[0]||0);
+    const ask=parseFloat(ob.result?.a?.[0]?.[0]||0);
+    if(!bid||!ask) return{ok:true,spreadPct:0,bid:price,ask:price};
+    const spreadPct=(ask-bid)/price;
+    return{ok:spreadPct<=SPREAD_MAX_PCT, spreadPct, bid, ask};
+  }catch(e){return{ok:true,spreadPct:0,bid:price,ask:price};}
+}
+async function checkDepth(symbol,price,side,orderSize){
+  try{
+    const ob=await pub(`/v5/market/orderbook?category=linear&symbol=${symbol}&limit=5`);
+    const levels=side==='Buy'?(ob.result?.a||[]):(ob.result?.b||[]);
+    let totalDepth=0;
+    for(const[p,q] of levels) totalDepth+=parseFloat(p)*parseFloat(q);
+    return{ok:totalDepth>=orderSize*price*3, depth:totalDepth};
+  }catch(e){return{ok:true,depth:0};}
+}
+// Fee coverage: expected move must be > 3× taker fees
+function checkFeeCoverage(expectedMovePct){
+  const takerFee = 0.00055; // 0.055% per side = 0.11% round trip
+  return expectedMovePct > takerFee * 3;
+}
+
+// ============================================================
+// SECTION M — DYNAMIC LEVERAGE + POSITION SIZING
+// Formula: Leverage = 1 / (slPct × 1.25), capped at pair max
+// ============================================================
+function calcDynamicLeverage(slPct, maxLeverage){
+  if(!slPct || slPct<=0) return Math.min(10, maxLeverage);
+  const dynamic = Math.floor(1/(slPct * 1.25));
+  return Math.max(1, Math.min(dynamic, Math.floor(maxLeverage)));
+}
+// Determine qty step from a known qty value (for partial close accuracy)
+function determineQtyStep(qty){
+  if(qty >= 1) return 1;
+  if(qty >= 0.1) return 0.1;
+  if(qty >= 0.01) return 0.01;
+  if(qty >= 0.001) return 0.001;
+  return 0.0001;
+}
+function calcOrder(balance, price, minQty, qtyStep, leverage, riskMult){
+  const dec = qtyStep.toString().includes('.') ? qtyStep.toString().split('.')[1].length : 0;
+  const alloc = balance * 0.60 * riskMult; // 60% of balance per allocation
+  let qty = Math.floor((alloc * leverage / price) / qtyStep) * qtyStep;
+  qty = parseFloat(qty.toFixed(dec));
+  if(qty < minQty) return{valid:false,leverage};
+  if(qty * price < 5) return{valid:false,leverage};
+  return{qty, leverage, margin:(qty*price)/leverage, valid:true};
+}
+
+// ============================================================
+// ============================================================
+// SECTION N — ADAPTIVE DUAL-SETUP ANALYSIS ENGINE v8
+// ─────────────────────────────────────────────────────────────
+// Architecture:
+//   15M = WHERE to trade + DIRECTION (zone defines bias — never gates entry alone)
+//   5M  = WHEN to enter (primary execution engine — MSS/sweep/displacement/VWAP/EMA)
+//   1M  = FINE-TUNE timing (confirmation layer — optional score booster)
+//
+// Two setup archetypes (both use same scoring funnel, different dominant signals):
+//   REVERSAL  — 15M zone + candle + sweep + MSS  → high confidence, zone-reaction
+//   MOMENTUM  — 5M displacement + VWAP/EMA + vol → high frequency, intraday momentum
+//
+// Scoring (additive, normalised to 0-100):
+//   zone15=15  bias15=10  candle15=10  mss5=25  sweep5=20
+//   displacement=15  vwap5=10  volume=15  momentum=10  atr=10  btc=10  oi=5
+//
+// Execution thresholds: VALID=65  STRONG=80  ELITE=90
+// Counter-trend tax: +7 pts added to effective threshold
+// ============================================================
+async function analyzeSymbolStructural(pair){
+  try{
+    // ── SESSION GATE (unchanged) ──
+    const sess = getSessionInfo();
+    if(sess.dangerous) return null;
+    if(S.paused) return null;
+    if(S.volatilityBreaker) return null;
+
+    // ── FETCH ALL TIMEFRAMES — MINI uses 1H instead of 4H for structural SL ──
+    const [r15,r5,r1,r1h,r4h,rOI] = await Promise.all([
+      pubCached(`/v5/market/kline?category=linear&symbol=${pair.symbol}&interval=15&limit=100`),
+      pubCached(`/v5/market/kline?category=linear&symbol=${pair.symbol}&interval=5&limit=80`),
+      pubCached(`/v5/market/kline?category=linear&symbol=${pair.symbol}&interval=1&limit=60`),
+      pubCached(`/v5/market/kline?category=linear&symbol=${pair.symbol}&interval=60&limit=30`),
+      pubCached(`/v5/market/kline?category=linear&symbol=${pair.symbol}&interval=240&limit=20`),
+      pub(`/v5/market/open-interest?category=linear&symbol=${pair.symbol}&intervalTime=5min&limit=8`),
+    ]);
+
+    const k15=(r15.result?.list||[]);
+    const k5 =(r5.result?.list||[]);
+    const k1 =(r1.result?.list||[]);
+    const k1h=(r1h.result?.list||[]);  // 1H candles
+    const k4h=(r4h.result?.list||[]);  // 4H candles (true 4H — used for deep structural SL anchor)
+    if(k15.length<30||k5.length<20||k1.length<15) return null;
+
+    const k15c=[...k15].reverse();
+    const k5c =[...k5].reverse();
+    const k1c =[...k1].reverse();
+    const k1hc=[...k1h].reverse();  // 1H reversed (chronological)
+    const k4hc=[...k4h].reverse();  // 4H reversed (chronological)
+
+    const price = parseFloat(k15c[k15c.length-1][4]);
+    if(!price||isNaN(price)||price<=0) return null;
+
+    const closes15 = k15c.map(k=>parseFloat(k[4]));
+    const closes5  = k5c.map(k=>parseFloat(k[4]));
+    const closes1  = k1c.map(k=>parseFloat(k[4]));
+
+    // ── ABSOLUTE HARD FILTERS (kept — these protect capital, not limit frequency) ──
+    // 1. Extreme consolidation (no movement = no scalp opportunity)
+    if(isConsolidating(closes15,14)){
+      log('i',`${pair.symbol}: SKIP (hard) — 15M deep consolidation`); return null;
+    }
+    // 2. Dead volume (no participants = no execution quality)
+    if(isDeadVolume(k5c,8)){
+      log('i',`${pair.symbol}: SKIP (hard) — 5M dead volume`); return null;
+    }
+
+    // ── ATR METRICS ──
+    const atr15 = calcATR(k15c,14);
+    const atr5  = calcATR(k5c,14);
+    const atr1  = calcATR(k1c,8);
+    const atrPct15 = price > 0 ? atr15/price : 0;
+
+    // Spike guard: extreme single-candle exhaustion — hard skip (unchanged)
+    const curO15=parseFloat(k15c[k15c.length-1][1]), curC15=parseFloat(k15c[k15c.length-1][4]);
+    if(atr15>0 && Math.abs(curC15-curO15)>atr15*2.8){
+      log('i',`${pair.symbol}: SKIP (hard) — 15M exhaustion spike`); return null;
+    }
+
+    // ── SPREAD CHECK (hard filter — execution quality) ──
+    const spreadCheck = await checkSpread(pair.symbol, price);
+    if(!spreadCheck.ok){
+      log('i',`${pair.symbol}: SKIP (hard) — spread ${(spreadCheck.spreadPct*100).toFixed(3)}% > max`);
+      return null;
+    }
+
+    // ── 4H STRUCTURAL STOP (preliminary — direction not yet assigned; resolved below) ──
+    // Direction is determined after zone detection. The authoritative call is at line sl4h_ below.
+    const sl4h = null; // placeholder — see sl4h_ after direction assignment
+
+    // ── 15M LAYER: DEFINE WHERE + DIRECTION ──
+    const zones    = find15MZones(k15c);
+    const zoneCheck = priceAtStructuralZone(price, zones, atr15);
+    const bias15   = tfBias(k15c);
+    const bias5    = tfBias(k5c);
+
+    // Direction assignment: 15M zone DRIVES direction (primary)
+    // If no clear zone: fallback to 5M bias-based direction (momentum setup)
+    let direction = null;
+    let atZone    = false;
+
+    if(zoneCheck.nearSupport)    { direction = 'LONG';  atZone = true; }
+    else if(zoneCheck.nearResistance){ direction = 'SHORT'; atZone = true; }
+    else {
+      // MOMENTUM FALLBACK: no 15M zone, but strong 5M bias → allow momentum setup
+      // This opens the door to pure 5M momentum trades not anchored to a 15M zone
+      if(bias5==='BULL') direction = 'LONG';
+      else if(bias5==='BEAR') direction = 'SHORT';
+      else { return null; } // no direction from either TF — skip
+    }
+
+    // ── STRUCTURAL STOP: 25% into 1H→4H gap (with direction now known) ──
+    const sl4h_ = calc4HStructuralSL(k1hc, k4hc, direction, price);
+    if(!sl4h_){ log('i',`${pair.symbol}: SKIP (hard) — no valid 1H structural SL`); return null; }
+    if(!checkFeeCoverage(sl4h_.slPct*1.2)){
+      log('i',`${pair.symbol}: SKIP (hard) — TP insufficient for fees`); return null;
+    }
+
+    // ── COUNTER-TREND CLASSIFICATION ──
+    const isCounterTrend =
+      (direction==='LONG'  && bias15==='BEAR') ||
+      (direction==='SHORT' && bias15==='BULL');
+    const isTrendAligned =
+      (direction==='LONG'  && bias15==='BULL') ||
+      (direction==='SHORT' && bias15==='BEAR') ||
+      bias15==='NEUTRAL';
+
+    // ── 15M REVERSAL CANDLE (CONFIDENCE BOOSTER — NOT GATEKEEPER) ──
+    const reversalOk = detectReversalCandle(k15c.slice(-3), direction);
+    // No hard reject here — reversal candle = score points only
+
+    // ── 5M EXECUTION ENGINE ──
+    const vwap5  = calcVWAP(k5c);
+    const vwap1  = calcVWAP(k1c);
+    const ema21on5 = calcEMA(closes5.slice(-30), 21);
+    const ema9on1  = calcEMA(closes1.slice(-20), 9);
+
+    const structShift   = detect5MStructureShift(k5c, direction);
+    const liquSweep     = detect5MLiqSweep(k5c, direction);
+    const displacement  = detect5MDisplacement(k5c, direction);
+    const vwapReclaim   = detect5MVwapReclaim(k5c, direction, vwap5);
+    const emaReclaim    = detect5MEmaReclaim(k5c, direction, ema21on5);
+    const volExpansion  = detect5MVolumeExpansion(k5c);
+
+    // 5M MINIMUM GATE: need at LEAST ONE of: MSS/MSB, sweep, displacement, or VWAP/EMA reclaim
+    // This prevents completely random entries with no 5M signal at all
+    const has5MSignal = structShift.msb || liquSweep.swept || displacement.displaced
+                     || vwapReclaim.reclaimed || emaReclaim.reclaimed;
+    if(!has5MSignal){
+      log('i',`${pair.symbol}: SKIP — no 5M execution signal (no MSS/sweep/displacement/reclaim)`);
+      return null;
+    }
+
+    // ── 1M CONFIRMATION (scoring only — not mandatory) ──
+    const pullback = detect1MPullback(k1c, direction, vwap1, ema9on1);
+
+    // ── VOLUME SIGNALS ──
+    const volSig5 = calcVolumeSignal(k5c, direction);
+    const volSig1 = calcVolumeSignal(k1c, direction);
+
+    // Volume divergence SOFT penalty (no hard reject — scored below)
+    const volumeDivergent = volSig5.divergence;
+    // Extreme dead volume: ratio < 0.20 = hard skip (too illiquid)
+    if(volSig5.ratio < 0.20){
+      log('i',`${pair.symbol}: SKIP (hard) — 5M volume ratio critical ${volSig5.ratio.toFixed(2)}x`);
+      return null;
+    }
+
+    // ── INDICATORS ──
+    const rsi15 = calcRSI(closes15,14);
+    const rsi5  = calcRSI(closes5,14);
+    const rsi1  = calcRSI(closes1,9);
+    const macd5 = calcMACD(closes5);
+    const stoch5 = calcStochRSI(closes5,14,3);
+    const candle15sig = calcCandles(k15c.slice(-3));
+    const candle5sig  = calcCandles(k5c.slice(-3));
+
+    // OI
+    const oiList = (rOI.result?.list||[]).reverse();
+    let oiRising=false, oiFalling=false;
+    if(oiList.length>=4){
+      const oiVals = oiList.map(x=>parseFloat(x.openInterest));
+      oiRising  = oiVals[oiVals.length-1]>oiVals[0]*1.002;
+      oiFalling = oiVals[oiVals.length-1]<oiVals[0]*0.998;
+    }
+
+    // ── BTC CORRELATION (scored, no longer hard-reject) ──
+    const btcScore = await scoreBtcCorrelation(direction);
+
+    // ═══════════════════════════════════════════════════════════
+    // ADAPTIVE SCORING ENGINE
+    // Each component returns a 0..1 fractional score.
+    // calcAdaptiveScore() multiplies by the point pool and normalises to 0-100.
+    // ═══════════════════════════════════════════════════════════
+
+    // zone15 — 15M zone quality (atZone = strong zone, fallback = weaker)
+    const zone15Raw = atZone
+      ? ( (zoneCheck.nearSupport&&direction==='LONG') || (zoneCheck.nearResistance&&direction==='SHORT') ? 1.0 : 0.7 )
+      : 0.25; // momentum setup not at zone = lower zone score
+
+    // bias15 — trend alignment
+    const bias15Raw = isTrendAligned && bias15!=='NEUTRAL' ? 1.0
+      : bias15==='NEUTRAL' ? 0.55
+      : 0.15; // counter-trend
+
+    // candle15 — 15M reversal candle (BONUS only — absence is 0, not negative)
+    let candle15Raw = 0.0; // default: no reversal candle = 0 points (not negative)
+    if(reversalOk){
+      candle15Raw = candle15sig===(direction==='LONG'?'BULL':'BEAR') ? 1.0
+        : candle15sig==='NEUTRAL' ? 0.7 : 0.5;
+    }
+    // Even absent reversal candle: if 15M candle is weakly confirming, partial credit
+    else if(candle15sig===(direction==='LONG'?'BULL':'BEAR')){
+      candle15Raw = 0.35;
+    }
+
+    // mss5 — 5M Market Structure Shift quality (with liquidity sweep penalty matrix)
+    const mss5Raw = structShift.mss ? 1.0                                        // full MSS confirmed (HH+HL or LH+LL)
+      : (structShift.msb && liquSweep.swept) ? 0.65                              // MSB preceded by liquidity sweep = valid
+      : structShift.msb ? 0.30                                                   // bare MSB without sweep = low quality
+      : 0.0;
+
+    // sweep5 — liquidity sweep quality
+    const sweep5Raw = liquSweep.swept
+      ? Math.min(1.0, 0.6 + liquSweep.sweepDepth * 20) // deeper sweep = higher score
+      : 0.0;
+
+    // displacement — 5M displacement candle
+    const dispRaw = displacement.displaced
+      ? Math.min(1.0, displacement.strength * 1.2)
+      : 0.0;
+
+    // vwap5 — VWAP reclaim on 5M
+    const vwap5Raw = vwapReclaim.reclaimed ? 1.0
+      : emaReclaim.reclaimed ? 0.7     // EMA reclaim is also valid
+      : pullback.nearVwap ? 0.4        // near VWAP on 1M = partial
+      : pullback.nearEma ? 0.3
+      : 0.0;
+
+    // volume — expansion + directional confirmation
+    let volRaw = 0.0;
+    if(volExpansion.strong) volRaw = 1.0;
+    else if(volExpansion.expanding) volRaw = 0.75;
+    else if(volSig5.spike) volRaw = 0.65;
+    else if(!volumeDivergent && volSig5.ratio>0.7) volRaw = 0.45;
+    else if(volumeDivergent) volRaw = 0.15; // divergence = penalty
+    // Boost if aligned volume trend
+    if((direction==='LONG'&&volSig5.trend==='UP')||(direction==='SHORT'&&volSig5.trend==='DOWN'))
+      volRaw = Math.min(1.0, volRaw + 0.15);
+
+    // momentum — RSI + 1M velocity
+    const rsiMom = direction==='LONG'?(rsi1>55?1.0:rsi1>48?0.75:rsi1>42?0.5:0.25)
+                                     :(rsi1<45?1.0:rsi1<52?0.75:rsi1<58?0.5:0.25);
+    const macdMom = (macd5.histogram>0&&direction==='LONG')||(macd5.histogram<0&&direction==='SHORT') ? 0.2 : 0;
+    const stochMom= (stoch5.k<35&&direction==='LONG')||(stoch5.k>65&&direction==='SHORT') ? 0.15 : 0;
+    const momRaw = Math.min(1.0, rsiMom + macdMom + stochMom);
+
+    // atr — volatility regime health
+    const atrRaw = atrPct15>0.005?0.95:atrPct15>0.003?0.80:atrPct15>0.0015?0.65:0.40;
+
+    // btc — correlation (already 0..1 from scoreBtcCorrelation)
+    const btcRaw = btcScore;
+
+    // oi — open interest alignment
+    const oiAligned = (direction==='LONG'&&oiRising)||(direction==='SHORT'&&oiFalling);
+    const oiRaw = oiAligned ? 1.0 : (oiRising||oiFalling) ? 0.5 : 0.3;
+
+    const rawScores = {
+      zone15:zone15Raw, bias15:bias15Raw, candle15:candle15Raw,
+      mss5:mss5Raw, sweep5:sweep5Raw, displacement:dispRaw,
+      vwap5:vwap5Raw, volume:volRaw, momentum:momRaw,
+      atr:atrRaw, btc:btcRaw, oi:oiRaw,
+    };
+
+    let score = calcAdaptiveScore(rawScores);
+
+    // ── COUNTER-TREND TAX (applied to threshold, not score) — reduced to 5 for MINI ──
+    const cfg = getCfg();
+    const COUNTER_TREND_TAX = 5;
+    const effectiveThresh = isCounterTrend
+      ? cfg.scoreThresh + COUNTER_TREND_TAX
+      : cfg.scoreThresh;
+
+    // ── SETUP TYPE CLASSIFICATION ──
+    let setupType = '5M-MOMENTUM'; // default if no zone
+    if(atZone && reversalOk && liquSweep.swept && structShift.mss){
+      setupType = 'REVERSAL-ELITE';
+    } else if(atZone && reversalOk && (structShift.msb || liquSweep.swept)){
+      setupType = 'REVERSAL';
+    } else if(atZone && structShift.msb){
+      setupType = 'ZONE-MSB';
+    } else if(vwapReclaim.reclaimed && displacement.displaced){
+      setupType = 'VWAP-DISPLACE';
+    } else if(vwapReclaim.reclaimed){
+      setupType = 'VWAP-RECLAIM';
+    } else if(emaReclaim.reclaimed){
+      setupType = 'EMA-RECLAIM';
+    } else if(liquSweep.swept && displacement.displaced){
+      setupType = 'SWEEP-DISPLACE';
+    } else if(liquSweep.swept){
+      setupType = 'LIQ-SWEEP';
+    } else if(displacement.displaced){
+      setupType = 'DISPLACEMENT';
+    }
+
+    // ── VOLUME ACCELERATION GATE (open-space momentum filter) ──
+    // 5M-MOMENTUM setups away from major 15M S/R zones must have active volume expansion
+    // to confirm institutional participation. Without it, these are low-conviction drift trades.
+    if(setupType === '5M-MOMENTUM' && !volExpansion.expanding && !volExpansion.strong){
+      log('i', `${pair.symbol}: SKIP — Open-space momentum setup requires active volume expansion`);
+      return null;
+    }
+
+    // ── DETAILED SCORE LOG (always shown for transparency) ──
+    const scoreParts = [
+      `zone15:${Math.round(rawScores.zone15*SCORE_POOL.zone15)}`,
+      `bias15:${Math.round(rawScores.bias15*SCORE_POOL.bias15)}`,
+      `candle15:${Math.round(rawScores.candle15*SCORE_POOL.candle15)}`,
+      `mss5:${Math.round(rawScores.mss5*SCORE_POOL.mss5)}`,
+      `sweep:${Math.round(rawScores.sweep5*SCORE_POOL.sweep5)}`,
+      `disp:${Math.round(rawScores.displacement*SCORE_POOL.displacement)}`,
+      `vwap:${Math.round(rawScores.vwap5*SCORE_POOL.vwap5)}`,
+      `vol:${Math.round(rawScores.volume*SCORE_POOL.volume)}`,
+      `mom:${Math.round(rawScores.momentum*SCORE_POOL.momentum)}`,
+      `atr:${Math.round(rawScores.atr*SCORE_POOL.atr)}`,
+      `btc:${Math.round(rawScores.btc*SCORE_POOL.btc)}`,
+      `oi:${Math.round(rawScores.oi*SCORE_POOL.oi)}`,
+    ].join(' ');
+
+    const trendTag = isCounterTrend ? `CT(${bias15})` : `TF(${bias15})`;
+    const decision = score >= effectiveThresh ? '✅ EXECUTE' : `❌ BELOW THRESH(${effectiveThresh})`;
+
+    log('i',`${pair.symbol} ${direction} | Score:${score} thresh:${effectiveThresh} ${decision} [${trendTag}] | ${setupType}`);
+    log('i',`  ↳ ${scoreParts}`);
+
+    if(score < effectiveThresh) return null;
+
+    const grade = deriveGrade(score);
+
+    return{
+      symbol:pair.symbol, direction, signal:direction, score, grade,
+      components:rawScores,   // kept for UI compatibility
+      setupType,
+      price, atr15, atr5, atr1, rsi15, rsi5, rsi1, macd5, stoch5,
+      bias5, bias15, isCounterTrend, isTrendAligned,
+      zoneCheck, atZone, reversalOk,
+      structShift, liquSweep, displacement, vwapReclaim, emaReclaim, volExpansion,
+      pullback,
+      sl4h:sl4h_, spreadCheck, oiRising, oiFalling,
+      volSig5, volSig1, candle15sig, candle5sig,
+      vwap5, vwap1, ema9on1, ema21on5,
+      rawScores,
+      pair, k15:k15c, k5:k5c, k1:k1c, k1h:k1hc, k4h:k4hc
+    };
+  }catch(e){ log('e',`analyzeSymbol error ${pair?.symbol}: ${e.message}`); return null; }
+}
+
+// ============================================================
+// SECTION O — TIER-1 MACRO SCANNER (every 60s)
+// Lightweight: volume / OI / volatility / trend ranking
+// Returns top N focus pairs for Tier-2 deep analysis
+// ============================================================
+async function tier1MacroScan(universe){
+  const ranked=[];
+  const batches = [];
+  for(let i=0;i<universe.length;i+=15) batches.push(universe.slice(i,i+15));
+
+  for(const batch of batches){
+    if(!S.running) return [];
+    const results = await Promise.all(batch.map(async p=>{
+      try{
+        const [r1,r5] = await Promise.all([
+          pub(`/v5/market/kline?category=linear&symbol=${p.symbol}&interval=1&limit=20`),
+          pub(`/v5/market/kline?category=linear&symbol=${p.symbol}&interval=5&limit=15`),
+        ]);
+        const k1 = (r1.result?.list||[]);
+        const k5 = (r5.result?.list||[]);
+        if(k1.length<8||k5.length<8) return null;
+        const cl1 = k1.map(x=>parseFloat(x[4])).reverse();
+        const vol1 = k1.map(x=>parseFloat(x[5])).reverse();
+        const atr1 = calcATR([...k1].reverse(),7);
+        const atr5 = calcATR([...k5].reverse(),7);
+        const chg  = ((cl1[cl1.length-1]-cl1[0])/cl1[0])*100;
+        const avgVol = vol1.slice(0,-1).reduce((a,b)=>a+b,0)/Math.max(vol1.length-1,1);
+        const curVol = vol1[vol1.length-1];
+        const volRatio = avgVol>0?curVol/avgVol:1;
+        const atrExp   = atr1>0&&atr5>0?atr1/atr5:1;
+        const oppScore = Math.abs(chg)*volRatio*Math.max(atrExp,0.5)*(p.volume/5000000);
+        return{...p,oppScore,chg,volRatio,atrExp};
+      }catch(e){ return null; }
+    }));
+    results.forEach(r=>{ if(r) ranked.push(r); });
+    await sleep(60);
+  }
+  return ranked.sort((a,b)=>b.oppScore-a.oppScore);
+}
+
+// ============================================================
+// SECTION P — DYNAMIC UNIVERSE BUILDER
+// Fetches all Bybit linear perpetuals, applies safety filters
+// ============================================================
+async function buildUniverse(){
+  try{
+    log('i','🌍 Building safe trading universe...');
+    const [tr,instrAll] = await Promise.all([
+      pub(`/v5/market/tickers?category=linear`),
+      (async()=>{
+        const map={}; let cursor='', page=0;
+        do{
+          const d=await pub(`/v5/market/instruments-info?category=linear&limit=1000${cursor?'&cursor='+encodeURIComponent(cursor):''}`);
+          (d.result?.list||[]).forEach(i=>map[i.symbol]=i);
+          cursor=d.result?.nextPageCursor||''; page++;
+        }while(cursor&&page<10);
+        return map;
+      })()
+    ]);
+    const tickers=(tr.result?.list||[]).filter(t=>t.symbol.endsWith('USDT')&&parseFloat(t.lastPrice)>0);
+    const universe=[];
+    for(const t of tickers){
+      const instr=instrAll[t.symbol];
+      if(!instr||instr.status!=='Trading') continue;
+      if(instr.contractType&&instr.contractType!=='LinearPerpetual') continue;
+      if(instr.symbolType&&instr.symbolType!=='MAINBOARD') continue;
+      const vol24h=parseFloat(t.turnover24h||0);
+      if(vol24h<5000000) continue;
+      const funding=Math.abs(parseFloat(t.fundingRate||0));
+      if(funding>0.005) continue;
+      const oiVal=parseFloat(t.openInterest||0)*parseFloat(t.lastPrice||0);
+      if(oiVal<2000000) continue;
+      const maxLev=parseFloat(instr?.leverageFilter?.maxLeverage||'10');
+      const minQty=parseFloat(instr?.lotSizeFilter?.minOrderQty||'1');
+      const qtyStep=parseFloat(instr?.lotSizeFilter?.qtyStep||'1');
+      const tickSize=instr?.priceFilter?.tickSize||'0.01'; // raw string — used for decimal precision
+      const price=parseFloat(t.lastPrice);
+      universe.push({
+        symbol:t.symbol, price, minQty, qtyStep, tickSize, maxLeverage:maxLev,
+        volume:vol24h, fundingRate:parseFloat(t.fundingRate||0), oi:oiVal
+      });
+    }
+    universe.sort((a,b)=>b.volume-a.volume);
+    S.tradableUniverse = universe.slice(0,UNIVERSE_CAP);
+    S.universeLastBuilt = Date.now();
+    document.getElementById('universeTotal').textContent = S.tradableUniverse.length;
+    document.getElementById('universeLastUpdate').textContent = 'Built '+new Date().toLocaleTimeString();
+    log('s',`✅ Universe: ${S.tradableUniverse.length} safe MAINBOARD pairs`);
+    return S.tradableUniverse;
+  }catch(e){ log('e','Universe: '+e.message); return []; }
+}
+
+// ============================================================
+// SECTION Q — ATR VOLATILITY-BASED TP CALCULATION
+// TP distance is trimmed to 75% of the full calculated target.
+// Earlier, more reliable exit — increases fill rate for scalping.
+// ============================================================
+function calcVolatilityTP(direction, entry, atr5, slPct){
+  const cfg = getCfg();
+  const mult = ATR_TP_MULT[S.regime] || 2.0;
+  let tp1Pct = atr5>0 ? (atr5 * mult) / entry : slPct * 1.5;
+  // Clamp to regime range
+  tp1Pct = Math.max(cfg.tp1Min, Math.min(cfg.tp1Max, tp1Pct));
+  // Trim to 75% of full distance — exit before the last 25% of the move
+  tp1Pct = tp1Pct * 0.75;
+  // Ensure TP still covers fees after trim
+  if(!checkFeeCoverage(tp1Pct)) tp1Pct = 0.003;
+  const tp1Price = direction==='LONG' ? entry*(1+tp1Pct) : entry*(1-tp1Pct);
+  return { tp1Price, tp1Pct };
+}
+
+// ============================================================
+// SECTION N2 — ENTRY OPTIMIZATION ENGINE v9
+// ─────────────────────────────────────────────────────────────
+// Architecture:
+//   setupScore  → determines IF a trade exists (unchanged v8 logic)
+//   entryScore  → determines WHEN/WHERE to execute (new v9 layer)
+//
+// Flow:
+//   validSetup → entryOptimization → executeTrade
+//
+// The entry optimizer NEVER cancels a valid setup.
+// It only attempts to improve fill location within a timeout window.
+// If no better entry is found, it executes at market immediately.
+//
+// Features implemented:
+//   1. MSS first-pullback entry (wait for micro retracement)
+//   2. VWAP retest optimization (wait for price to return to VWAP)
+//   3. Best entry window (3-5 candle scan for best price)
+//   4. Liquidity reclaim confirmation timing
+//   5. Candle close quality ranking (not a filter)
+//   6. Dynamic entryScore (0-100, ranking only)
+//   7. Hard timeout fallback — never misses a trade
+// ============================================================
+
+// Configuration for entry optimization
+const ENTRY_OPT = {
+  // How long to wait for an optimized entry (ms) before executing at market
+  // This is the MAXIMUM wait — trades always execute before timeout
+  windowMs:         15000,   // Extended to 15s to let order book layers settle
+  // Pullback detection: how deep a retracement to wait for
+  pullbackMinPct:   0.0015,  // Increased to 0.15% to guarantee a localized entry discount
+  pullbackMaxPct:   0.0050,  // Capped at 0.5% to avoid capturing a structural collapse
+  // VWAP retest: how close to VWAP is "at VWAP"
+  vwapRetestPct:    0.0025,  // Tightened to 0.25% proximity for precision targeting
+  // Candle window: how many 1M candles to observe for best entry
+  candleWindowSize: 5,       // Evaluates across 5 ticks for peak optimization
+  // Extended distance from VWAP that triggers a wait-for-retest
+  vwapExtendedPct:  0.0060,  // Lowered tolerance for over-extended, risky chases
+};
+
+// ── ENTRY SCORE CALCULATOR ──────────────────────────────────────────────────
+// Rates a candidate entry price from 0-100.
+// Higher = better. Used for ranking during window, never for filtering.
+function calcEntryScore(result, candidatePrice) {
+  let score = 50; // base: neutral
+
+  const dir = result.direction;
+  const entry = result.price;    // signal price
+  const vwap5 = result.vwap5;
+  const vwap1 = result.vwap1;
+  const k1c   = result.k1;
+  const atr5  = result.atr5 || entry * 0.003;
+
+  // ── FACTOR 1: PULLBACK DEPTH (0-25 pts) ──
+  // For longs: lower price = better entry (closer to support)
+  // For shorts: higher price = better entry (closer to resistance)
+  const priceDiff = dir === 'LONG'
+    ? (entry - candidatePrice) / entry    // positive = pulled back
+    : (candidatePrice - entry) / entry;   // positive = bounced up
+
+  if (priceDiff > 0) {
+    // Has pulled back — award points based on depth
+    // Sweet spot: 0.1%–0.4% pullback
+    const depthRatio = priceDiff / 0.004; // normalize to 0.4% max
+    score += Math.min(25, Math.round(depthRatio * 25));
+  } else {
+    // Price has moved away from us — penalize slightly
+    score -= Math.min(15, Math.round(Math.abs(priceDiff) / 0.003 * 15));
+  }
+
+  // ── FACTOR 2: VWAP PROXIMITY (0-20 pts) ──
+  // Entries near VWAP have better structure
+  if (vwap5 > 0) {
+    const vwapDist = Math.abs(candidatePrice - vwap5) / vwap5;
+    if (vwapDist < 0.002) score += 20;       // at VWAP = excellent
+    else if (vwapDist < 0.004) score += 12;  // near VWAP = good
+    else if (vwapDist < 0.008) score += 5;   // somewhat near
+    else score -= 5;                          // extended from VWAP
+  }
+
+  // ── FACTOR 3: CANDLE CLOSE QUALITY (0-20 pts) ──
+  // Longs: prefer candles closing in upper 50% of range
+  // Shorts: prefer candles closing in lower 50% of range
+  if (k1c && k1c.length >= 2) {
+    const lastC = k1c[k1c.length - 1];
+    const co = parseFloat(lastC[1]), ch = parseFloat(lastC[2]);
+    const cl = parseFloat(lastC[3]), cc = parseFloat(lastC[4]);
+    const range = ch - cl;
+    if (range > 0) {
+      const closePos = (cc - cl) / range; // 0 = at low, 1 = at high
+      if (dir === 'LONG') {
+        // Prefer close near high (strength)
+        score += Math.round(closePos * 20);
+      } else {
+        // Prefer close near low (weakness)
+        score += Math.round((1 - closePos) * 20);
+      }
+    }
+  }
+
+  // ── FACTOR 4: LIQUIDITY RECLAIM QUALITY (0-15 pts) ──
+  // A clean reclaim (price back above swept level for LONG) = higher quality
+  const sweep = result.liquSweep;
+  if (sweep && sweep.swept) {
+    const reclaimLevel = dir === 'LONG' ? sweep.recentSupport : sweep.recentResist;
+    if (reclaimLevel > 0) {
+      const aboveReclaim = dir === 'LONG'
+        ? (candidatePrice - reclaimLevel) / reclaimLevel
+        : (reclaimLevel - candidatePrice) / reclaimLevel;
+      if (aboveReclaim > 0.001) score += 15;      // well above reclaim = clean
+      else if (aboveReclaim > 0) score += 8;       // just above = ok
+      else score -= 5;                              // still below = not reclaimed yet
+    }
+  }
+
+  // ── FACTOR 5: ATR-BASED POSITION IN MOVE (0-10 pts) ──
+  // Penalize entries very far from setup price (chasing)
+  const moveFromSetup = Math.abs(candidatePrice - entry) / atr5;
+  if (moveFromSetup < 0.5) score += 10;     // within 0.5 ATR of setup = ideal
+  else if (moveFromSetup < 1.0) score += 5;
+  else if (moveFromSetup > 2.0) score -= 10; // chasing heavily
+
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+// ── MSS PULLBACK DETECTOR ───────────────────────────────────────────────────
+// After MSS is confirmed, waits for the first micro-pullback before entry.
+// Returns true if a valid pullback entry opportunity is present NOW.
+function detectMSSPullbackOpportunity(result, currentPrice) {
+  const dir = result.direction;
+  const setupPrice = result.price;
+  const atr5 = result.atr5 || setupPrice * 0.003;
+
+  // Pullback = price has retraced from setup price in opposite direction
+  const retrace = dir === 'LONG'
+    ? (setupPrice - currentPrice) / setupPrice   // positive = pulled back below setup
+    : (currentPrice - setupPrice) / setupPrice;  // positive = bounced above setup
+
+  const minRetrace = ENTRY_OPT.pullbackMinPct;
+  const maxRetrace = ENTRY_OPT.pullbackMaxPct;
+
+  // Valid pullback: has retraced at least minPct but not more than maxPct (would be reversal)
+  if (retrace >= minRetrace && retrace <= maxRetrace) {
+    return { valid: true, retrace, quality: Math.min(1, retrace / 0.003) };
+  }
+
+  // Price hasn't pulled back yet — tell caller to keep waiting
+  if (retrace < minRetrace) {
+    return { valid: false, reason: 'awaiting_pullback', retrace };
+  }
+
+  // Price has moved too far from setup (reversal risk) — execute immediately
+  return { valid: false, reason: 'timeout_execute', retrace };
+}
+
+// ── VWAP RETEST DETECTOR ────────────────────────────────────────────────────
+// Returns true if price is currently retesting VWAP (within threshold).
+function detectVWAPRetest(result, currentPrice) {
+  const vwap = result.vwap5 || result.vwap1;
+  if (!vwap || vwap <= 0) return { retesting: true }; // no VWAP = don't wait
+
+  const distPct = Math.abs(currentPrice - vwap) / vwap;
+  const retesting = distPct <= ENTRY_OPT.vwapRetestPct;
+  const extended  = distPct > ENTRY_OPT.vwapExtendedPct;
+
+  return { retesting, extended, distPct };
+}
+
+// ── BEST ENTRY WINDOW SCANNER ───────────────────────────────────────────────
+// Observes multiple 1M candles and picks the best entry price.
+// Returns when: (a) ideal entry found, (b) trend resuming (chase immediately),
+// or (c) timeout reached (execute at market).
+async function waitForBestEntry(result) {
+  const dir     = result.direction;
+  const sym     = result.symbol;
+  const setupPx = result.price;
+  const atr5    = result.atr5 || setupPx * 0.003;
+  const startMs = Date.now();
+
+  let bestPrice     = setupPx;         // fallback = signal price
+  let bestEntryScore = calcEntryScore(result, setupPx);
+  let windowCandles  = 0;
+  let forcedEntry    = false;
+  let entryReason    = 'immediate';
+
+  // Check if we should even wait for a pullback
+  const mssConfirmed = result.structShift && (result.structShift.mss || result.structShift.msb);
+  const hasLiqSweep  = result.liquSweep && result.liquSweep.swept;
+  const vwapDist     = result.vwap5 > 0
+    ? Math.abs(setupPx - result.vwap5) / result.vwap5 : 0;
+  const priceExtended = vwapDist > ENTRY_OPT.vwapExtendedPct;
+
+  // If price is NOT extended from VWAP and no MSS — execute immediately (fast setup)
+  // This preserves frequency for momentum setups that shouldn't wait
+  const shouldWait = mssConfirmed || priceExtended || hasLiqSweep;
+
+  if (!shouldWait) {
+    bestEntryScore = calcEntryScore(result, setupPx);
+    log('i', `[ENTRY-OPT] ${sym} ${dir}: immediate execute (fast momentum setup) | entryScore:${bestEntryScore}`);
+    return { price: setupPx, entryScore: bestEntryScore, reason: 'fast_momentum' };
+  }
+
+  log('i', `[ENTRY-OPT] ${sym} ${dir}: starting entry optimization window | MSS:${mssConfirmed} extended:${priceExtended} sweep:${hasLiqSweep}`);
+
+  // ── ENTRY OPTIMIZATION WINDOW ──────────────────────────────────────────────
+  while (Date.now() - startMs < ENTRY_OPT.windowMs) {
+    if (!S.running) break;
+
+    // Check timeout — always exit window to execute
+    const elapsed = Date.now() - startMs;
+    if (elapsed >= ENTRY_OPT.windowMs) {
+      forcedEntry = true;
+      entryReason = 'timeout_execute';
+      break;
+    }
+
+    // Fetch fresh 1M price
+    let currentPrice = setupPx;
+    try {
+      const tick = await pub(`/v5/market/tickers?category=linear&symbol=${sym}`);
+      currentPrice = parseFloat(tick.result?.list?.[0]?.lastPrice || setupPx);
+    } catch(e) { currentPrice = setupPx; }
+
+    if (!currentPrice || currentPrice <= 0) { await sleep(1500); continue; }
+
+    // ── CHECK: TREND RESUMING — ENTER IMMEDIATELY ──────────────────────────
+    // If price is moving strongly away from us, chase and enter now
+    const trending = dir === 'LONG'
+      ? (currentPrice - setupPx) / setupPx > 0.003    // moved 0.3% up = trend resuming
+      : (setupPx - currentPrice) / setupPx > 0.003;   // moved 0.3% down = trend resuming
+
+    if (trending) {
+      const trendScore = calcEntryScore(result, currentPrice);
+      // Still better entry than doing nothing
+      if (currentPrice !== bestPrice) {
+        bestPrice = currentPrice;
+        bestEntryScore = trendScore;
+      }
+      entryReason = 'trend_resuming_chase';
+      log('i', `[ENTRY-OPT] ${sym} ${dir}: trend resuming — chasing entry @ ${currentPrice.toFixed(6)} | entryScore:${trendScore}`);
+      break;
+    }
+
+    // ── CHECK: MSS PULLBACK OPPORTUNITY ────────────────────────────────────
+    if (mssConfirmed) {
+      const pb = detectMSSPullbackOpportunity(result, currentPrice);
+      if (pb.valid) {
+        const pbScore = calcEntryScore(result, currentPrice);
+        if (pbScore > bestEntryScore) {
+          bestPrice = currentPrice;
+          bestEntryScore = pbScore;
+          entryReason = 'mss_pullback';
+          log('i', `[ENTRY-OPT] ${sym} ${dir}: MSS pullback detected @ ${currentPrice.toFixed(6)} retrace:${(pb.retrace*100).toFixed(3)}% entryScore:${pbScore}`);
+          break; // take the pullback immediately
+        }
+      } else if (pb.reason === 'timeout_execute') {
+        // Retraced too far — reversal risk, execute best price found so far
+        forcedEntry = true;
+        entryReason = 'pullback_too_deep';
+        break;
+      }
+    }
+
+    // ── CHECK: VWAP RETEST ──────────────────────────────────────────────────
+    if (priceExtended) {
+      const vr = detectVWAPRetest(result, currentPrice);
+      if (vr.retesting) {
+        const vrScore = calcEntryScore(result, currentPrice);
+        if (vrScore > bestEntryScore) {
+          bestPrice = currentPrice;
+          bestEntryScore = vrScore;
+          entryReason = 'vwap_retest';
+          log('i', `[ENTRY-OPT] ${sym} ${dir}: VWAP retest @ ${currentPrice.toFixed(6)} dist:${(vr.distPct*100).toFixed(3)}% entryScore:${vrScore}`);
+          break; // take the VWAP retest immediately
+        }
+      }
+    }
+
+    // ── CHECK: CANDLE WINDOW — ACCUMULATE BEST ────────────────────────────
+    // Track current price as candidate, update best if better
+    const candidateScore = calcEntryScore(result, currentPrice);
+    if (candidateScore > bestEntryScore) {
+      bestPrice = currentPrice;
+      bestEntryScore = candidateScore;
+      entryReason = 'window_best';
+      log('i', `[ENTRY-OPT] ${sym} ${dir}: new best @ ${currentPrice.toFixed(6)} entryScore:${candidateScore} (prev:${bestEntryScore})`);
+    }
+
+    windowCandles++;
+    if (windowCandles >= ENTRY_OPT.candleWindowSize) {
+      entryReason = 'window_complete';
+      break;
+    }
+
+    await sleep(2000); // check every 2 seconds
+  }
+
+  if (forcedEntry) {
+    // Fetch final price for timeout execution
+    try {
+      const tick = await pub(`/v5/market/tickers?category=linear&symbol=${sym}`);
+      const fp = parseFloat(tick.result?.list?.[0]?.lastPrice || bestPrice);
+      if (fp > 0) bestPrice = fp;
+    } catch(e) {}
+    bestEntryScore = calcEntryScore(result, bestPrice);
+    log('i', `[ENTRY-OPT] ${sym} ${dir}: timeout/forced execute @ ${bestPrice.toFixed(6)} entryScore:${bestEntryScore} reason:${entryReason}`);
+  }
+
+  log('i', `[ENTRY-OPT] ${sym} ${dir}: DONE | bestPrice:${bestPrice.toFixed(6)} entryScore:${bestEntryScore} reason:${entryReason} windowCandles:${windowCandles}`);
+  return { price: bestPrice, entryScore: bestEntryScore, reason: entryReason };
+}
+
+// ============================================================
+// SECTION R — OPEN STRUCTURAL TRADE (v9 — with Entry Optimizer)
+// ============================================================
+// Flow: LOCK → recheck live positions → reserve pending slot →
+//        validate → submit → confirm fill → register → UNLOCK
+// No parallel execution can bypass this gate.
+// ============================================================
+async function openStructuralTrade(result){
+  if(!S.running) return;
+  if(S.paused){ log('w',`${result.symbol}: SKIP — bot paused: ${S.pauseReason}`); return; }
+  if(isCoolingDown(result.symbol)) return;
+
+  // ── IN-FLIGHT ORDER LOCK GATE ──
+  // Hard-stops duplicate async entries for the same symbol before Bybit confirms fill.
+  if(_inFlightOrders.has(result.symbol)) return;
+  if(S.openPositions.find(p=>p.symbol===result.symbol)) return;
+
+  // Lock the symbol immediately to prevent duplicate async loops from entering
+  _inFlightOrders.add(result.symbol);
+  log('i',`[LOCK] ${result.symbol} locked in-flight. Processing order transmission...`);
+
+  try {
+
+  // ── PRE-LOCK FAST REJECTION (avoids lock contention on obvious skips) ──
+  if(!hasOpenSlot()){
+    log('w',`EXECUTION LOCK  ${result.symbol}: SKIP — cap reached before lock (open:${S.openPositions.length} pending:${_pendingExecutions.size}/${MAX_POSITIONS})`);
+    return;
+  }
+  if(S.openPositions.find(p=>p.symbol===result.symbol) || _pendingExecutions.has(result.symbol)){
+    log('w',`${result.symbol}: SKIP — already open or pending`); return;
+  }
+
+  // ── ACQUIRE EXECUTION MUTEX ──
+  // Serialises all order submissions — only one trade in-flight at a time.
+  const unlock = await acquireExecLock();
+  try{
+    // ── POST-LOCK HARD RECHECK (authoritative — race-condition safe) ──
+    const livePositions = await getPositions();
+    // Sync confirmed positions against registry (source of truth = Bybit)
+    const liveSyms = livePositions.map(p=>p.symbol);
+    // Remove any stale S.openPositions entries not on Bybit (already closed externally)
+    S.openPositions = S.openPositions.filter(p=>liveSyms.includes(p.symbol)||p.status!=='open');
+
+    const currentCount = hardPositionCount();
+    if(currentCount >= MAX_POSITIONS){
+      log('w',`EXECUTION LOCK ACQUIRED  ${result.symbol}  Current positions: ${currentCount}/${MAX_POSITIONS}  New trade rejected  Reason: max position cap reached`);
+      return;
+    }
+    if(S.openPositions.find(p=>p.symbol===result.symbol) || _pendingExecutions.has(result.symbol)){
+      log('w',`${result.symbol}: SKIP (post-lock) — duplicate symbol blocked`); return;
+    }
+    if(isCorrelationBlocked(result.direction)){
+      log('w',`${result.symbol}: SKIP — correlation limit (1 per direction)`); return;
+    }
+
+    // ── RESERVE PENDING SLOT IMMEDIATELY ──
+    // From this point, the slot is counted as consumed until confirmed or failed.
+    _pendingExecutions.add(result.symbol);
+    log('i',`Position reserved  Symbol: ${result.symbol}  Pending executions: ${_pendingExecutions.size}  Remaining slots: ${MAX_POSITIONS - hardPositionCount()}`);
+
+  // All subsequent execution logic runs inside the pending-slot reservation.
+  // A nested try/finally guarantees the slot is released on any failure path.
+  try{
+
+  // ── ENTRY OPTIMIZATION (v9) ─────────────────────────────────────────────
+  // Run the entry optimizer BEFORE sizing/leverage — it may wait up to windowMs
+  // for a better entry price (MSS pullback, VWAP retest, best candle window).
+  // ALWAYS produces a price — never cancels the trade.
+  // The optimizer runs concurrently with the slot reservation so the position
+  // cap is correctly held during the wait window.
+  const entryOpt = await waitForBestEntry(result);
+  const optimizedPrice = entryOpt.price;
+  const entryScore     = entryOpt.entryScore;
+  log('i',`[ENTRY-OPT] ${result.symbol}: optimized entry @ ${optimizedPrice.toFixed(6)} | entryScore:${entryScore} | reason:${entryOpt.reason}`);
+
+  const cfg = getCfg();
+  const bal = await getBalance();
+  if(bal < 1){ log('w','Balance too low: '+bal.toFixed(4)); return; }
+  S.balance = bal;
+
+  // Fresh price — use optimizer result as primary, fall back to live ticker
+  let freshPrice = optimizedPrice;
+  try {
+    const td = await pub(`/v5/market/tickers?category=linear&symbol=${result.symbol}`);
+    const livePrice = parseFloat(td.result?.list?.[0]?.lastPrice || optimizedPrice);
+    // If optimizer gave a better price for direction, keep it; else use live
+    const diff = result.direction === 'LONG'
+      ? (optimizedPrice - livePrice) / livePrice   // negative = optimizer is cheaper (better for long)
+      : (livePrice - optimizedPrice) / livePrice;  // negative = optimizer is more expensive (better for short)
+    // Use optimized if it's within 0.5% better; otherwise use live (don't chase stale price)
+    freshPrice = (Math.abs(diff) < 0.005 && diff <= 0) ? optimizedPrice : livePrice;
+    log('i',`[PRICE] ${result.symbol}: optimized:${optimizedPrice.toFixed(6)} live:${livePrice.toFixed(6)} → using:${freshPrice.toFixed(6)} | entryScore:${entryScore}`);
+  } catch(e) {
+    freshPrice = optimizedPrice;
+  }
+
+  // Re-verify spread at execution
+  const freshSpread = await checkSpread(result.symbol, freshPrice);
+  if(!freshSpread.ok){ log('w',`${result.symbol}: SKIP — spread wide at entry`); return; }
+
+  // Recalculate structural SL at fresh price — 25% into the 1H→4H gap
+  const freshSL = calc4HStructuralSL(result.k1h, result.k4h, result.direction, freshPrice);
+  if(!freshSL){ log('w',`${result.symbol}: SKIP — 1H SL invalid at fresh price`); return; }
+
+  // Dynamic leverage: 1/(slPct×1.25)
+  const leverage = calcDynamicLeverage(freshSL.slPct, result.pair.maxLeverage);
+
+  // Grade-based risk multiplier: A+ = full, A = 82%, B = 62%
+  const gradeRisk = result.grade==='A+'?1.0:result.grade==='A'?0.82:0.62;
+  const finalRisk = cfg.riskMult * gradeRisk;
+
+  const orderCalc = calcOrder(bal, freshPrice, result.pair.minQty, result.pair.qtyStep, leverage, finalRisk);
+  if(!orderCalc.valid){ log('w',`${result.symbol}: SKIP — order invalid (lev:${leverage}x sl:${(freshSL.slPct*100).toFixed(2)}%)`); return; }
+
+  // ── MINIMUM NOTIONAL VALIDATION (Fix: prevent silent Bybit rejections) ──
+  // Bybit requires minimum 5 USDT notional per order. Enforce this BEFORE submission
+  // to prevent silent failures, infinite scan loops, and fake "no trade" behavior.
+  const notional = orderCalc.qty * freshPrice;
+  const minNotional = result.pair.minQty
+    ? Math.max(5, result.pair.minQty * freshPrice)
+    : 5;
+
+  console.log(`[ORDER] ${result.symbol} — qty:${orderCalc.qty} price:${freshPrice.toFixed(6)} notional:${notional.toFixed(4)} USDT (min:${minNotional.toFixed(2)}) lev:${leverage}x`);
+  log('i',`[ORDER] ${result.symbol} qty:${orderCalc.qty} @ ${freshPrice.toFixed(4)} = notional:${notional.toFixed(4)} USDT | lev:${leverage}x | minRequired:${minNotional.toFixed(2)} USDT`);
+
+  if(notional < 5){
+    console.log(`[ORDER] ${result.symbol} REJECTED — notional ${notional.toFixed(4)} USDT is below Bybit minimum (5 USDT). bal:${bal.toFixed(4)} qty:${orderCalc.qty} price:${freshPrice}`);
+    log('w',`[ORDER] ❌ ${result.symbol}: order rejected — notional ${notional.toFixed(4)} USDT < 5 USDT minimum. Increase balance or reduce leverage.`);
+    return false;
+  }
+  if(notional < minNotional){
+    console.log(`[ORDER] ${result.symbol} REJECTED — notional ${notional.toFixed(4)} USDT below symbol minimum ${minNotional.toFixed(2)} USDT`);
+    log('w',`[ORDER] ❌ ${result.symbol}: order rejected — notional ${notional.toFixed(4)} below symbol min ${minNotional.toFixed(2)} USDT`);
+    return false;
+  }
+  console.log(`[ORDER] ${result.symbol} APPROVED — notional ${notional.toFixed(4)} USDT passes minimum check`);
+
+  // OB depth check
+  const side = result.direction==='LONG'?'Buy':'Sell';
+  const depthCheck = await checkDepth(result.symbol, freshPrice, side, orderCalc.qty);
+  if(!depthCheck.ok){ log('w',`${result.symbol}: SKIP — OB depth insufficient`); return; }
+
+  // ATR-based volatility TP1 + runner setup
+  const { tp1Price, tp1Pct } = calcVolatilityTP(result.direction, freshPrice, result.atr5, freshSL.slPct);
+
+  // FIX 2: Verify live price has not crossed the SL anchor during the optimizer window.
+  // If price spiked past freshSL.slPrice before transmission, the SL would be invalid
+  // on arrival at Bybit — reject cleanly for this cycle rather than get a server error.
+  try {
+    const liveCheck = await pub(`/v5/market/tickers?category=linear&symbol=${result.symbol}`);
+    const liveNow = parseFloat(liveCheck.result?.list?.[0]?.lastPrice || freshPrice);
+    const slCrossed = result.direction === 'LONG'
+      ? liveNow <= freshSL.slPrice   // price dumped below SL before we even entered
+      : liveNow >= freshSL.slPrice;  // price spiked above SL before we even entered
+    if(slCrossed){
+      log('w',`${result.symbol}: SKIP — live price ${liveNow} crossed SL anchor ${freshSL.slPrice.toFixed(pricePrecision)} during optimizer window`);
+      return;
+    }
+  } catch(e) { /* non-fatal — proceed if check fails */ }
+
+  // FIX 3: Clean symmetric assignment — both sides resolve to freshSL.slPrice
+  // (the 1H absolute wick anchor is direction-aware inside calc4HStructuralSL itself)
+  const slPrice = freshSL.slPrice;
+
+  // FIX 1: Derive price decimal precision from the instrument's actual tickSize string.
+  // tickSize is stored on result.pair at universe build time (e.g. "0.0001" for XRP,
+  // "0.5" for BTC, "0.01" for most mid-range alts). Counting its decimal places gives
+  // the exact precision Bybit requires — no guessing from price magnitude.
+  const _tickSizeStr = result.pair.tickSize || '0.01';
+  const _tickDot = _tickSizeStr.indexOf('.');
+  const pricePrecision = _tickDot === -1 ? 0 : _tickSizeStr.length - _tickDot - 1;
+  const fp = (n) => n.toFixed(pricePrecision);
+
+  // ── EXECUTION FLOW (UTA-safe): validate balance → validate leverage → place order ──
+  // No margin-mode switching. Account is pre-configured as CROSS.
+  log('i',`EXECUTION READY  Symbol: ${result.symbol}  Margin Mode: CROSS (existing)  Balance OK`);
+
+  // Set leverage — retry once on failure, then skip cleanly (do NOT halt scanner)
+  let leverageOk = false;
+  for(let _lev=0; _lev<2; _lev++){
+    try{
+      const levRes = await api('POST','/v5/position/set-leverage',{
+        category:'linear', symbol:result.symbol,
+        buyLeverage:leverage.toString(), sellLeverage:leverage.toString()
+      });
+      // retCode 0 = set, 110043 = leverage already correct — both are fine
+      if(levRes.retCode===0||levRes.retCode===110043){
+        leverageOk = true;
+        log('i',`EXECUTION READY  Symbol: ${result.symbol}  Leverage OK (${leverage}x)  Submitting order...`);
+        break;
+      }
+      log('w',`${result.symbol}: leverage attempt ${_lev+1}: [${levRes.retCode}] ${levRes.retMsg}`);
+    }catch(e){ log('w',`${result.symbol}: leverage API error attempt ${_lev+1}: ${e.message}`); }
+    if(_lev===0) await sleep(600); // wait before retry
+  }
+  if(!leverageOk){
+    log('w',`SKIP EXECUTION  Reason: leverage setup failed  Symbol: ${result.symbol} — scanner continues`);
+    return;
+  }
+
+  log('i',`[EXEC] ${result.symbol}: qty:${orderCalc.qty} lev:${leverage}x margin:${orderCalc.margin.toFixed(3)} USDT notional:${notional.toFixed(4)} USDT | SL(4H):${(freshSL.slPct*100).toFixed(2)}% TP1:${(tp1Pct*100).toFixed(2)}% spread:${(freshSpread.spreadPct*100).toFixed(3)}%`);
+  console.log(`[EXEC] ${result.symbol} — Submitting order: side:${side} qty:${orderCalc.qty} price:${fp(freshPrice)} SL:${fp(slPrice)} TP:${fp(tp1Price)} notional:${notional.toFixed(4)} USDT (pricePrecision:${pricePrecision}dp)`);
+
+  // PLACE LIMIT ORDER
+  let res;
+  try{
+    res = await api('POST','/v5/order/create',{
+      category:'linear', symbol:result.symbol,
+      side, orderType:'Limit', qty:orderCalc.qty.toString(),
+      price:fp(freshPrice),
+      stopLoss:fp(slPrice),
+      takeProfit:fp(tp1Price), // initial TP for full qty
+      slTriggerBy:'LastPrice', tpTriggerBy:'LastPrice',
+      timeInForce:'GTC', reduceOnly:false, positionIdx:0
+    });
+  }catch(e){
+    console.error(`[EXEC] ${result.symbol}: order API error — ${e.message}`);
+    log('e',`${result.symbol}: order error — ${e.message}`);
+    return;
+  }
+
+  if(!res||res.retCode!==0){
+    const bybitReason = res?.retMsg || 'unknown';
+    const bybitCode   = res?.retCode || 'n/a';
+    console.error(`[EXEC] ${result.symbol}: Bybit REJECTED order — code:${bybitCode} reason:"${bybitReason}" | qty:${orderCalc.qty} notional:${notional.toFixed(4)} USDT lev:${leverage}x`);
+    log('e',`[EXEC] ❌ ${result.symbol}: Bybit rejection — [${bybitCode}] ${bybitReason} | qty:${orderCalc.qty} notional:${notional.toFixed(4)} USDT`);
+    return;
+  }
+  const orderId = res.result?.orderId;
+  log('i',`Order placed: ${result.symbol} ${side} LIMIT @ ${fp(freshPrice)} | Waiting fill (25s)...`);
+
+  // POLL FILL (25s timeout)
+  let filled = false;
+  for(let i=0;i<25;i+=2){
+    await sleep(2000); if(!S.running) return;
+    try{
+      const d = await api('GET','/v5/order/realtime',{category:'linear',symbol:result.symbol,orderId});
+      const o = d.result?.list?.[0];
+      if(!o){
+        const h = await api('GET','/v5/order/history',{category:'linear',symbol:result.symbol,orderId,limit:1});
+        const ho = h.result?.list?.[0];
+        if(ho?.orderStatus==='Filled'){ filled=true; break; }
+        if(ho?.orderStatus==='Cancelled'||ho?.orderStatus==='Rejected') break;
+      } else {
+        if(o.orderStatus==='Filled'){ filled=true; break; }
+        if(o.orderStatus==='Cancelled'||o.orderStatus==='Rejected') break;
+      }
+    }catch(e){}
+  }
+
+  if(!filled){
+    try{ await api('POST','/v5/order/cancel',{category:'linear',symbol:result.symbol,orderId}); }catch(e){}
+    log('w',`${result.symbol}: limit not filled in 25s — cancelled`); return;
+  }
+
+  // Confirm fill — fetch live position for actual entry
+  const livePos = await getPositions();
+  const lp = livePos.find(p=>p.symbol===result.symbol);
+  const actualEntry = lp ? parseFloat(lp.avgPrice||freshPrice) : freshPrice;
+  const liqPrice = lp ? parseFloat(lp.liqPrice||0) : 0;
+
+  setCooldown(result.symbol);
+
+  const t = {
+    id:orderId, symbol:result.symbol, side:result.direction,
+    entryPrice:actualEntry, qty:orderCalc.qty, leverage,
+    sl:slPrice, tp:tp1Price, tp1Price, tp1Pct,
+    slPct:freshSL.slPct, slMethod:freshSL.method,
+    openTime:Date.now(), status:'open', pnl:0, livePnl:0,
+    margin:orderCalc.margin, score:result.score, grade:result.grade,
+    setupType:result.setupType,
+    entryScore, entryOptReason: entryOpt.reason,
+    // Instrument precision — stored at entry for use in all subsequent order formatting
+    tickSize: result.pair.tickSize || '0.01',
+    qtyStep:  result.pair.qtyStep  || 0.001,
+    // Staged exit state
+    tp1Hit:false, partialClosed1:false,   // TP1 = 75%
+    runnerActive:false, trailStop:0,       // Runner = 25%
+    breakeven:false,
+    // Live data
+    liqPrice, currentPrice:actualEntry,
+    atr5:result.atr5,
+  };
+  S.trades.unshift(t);
+  S.openPositions.push(t);
+  saveState();
+  updateTradeLog(); updateStats(); updateLivePanel();
+  log('s',`✅ FILLED: ${result.symbol} ${result.direction} ${result.grade} ${leverage}x @ ${actualEntry.toFixed(6)} | ${result.setupType} | SL:${(freshSL.slPct*100).toFixed(2)}% TP1(ATR):${(tp1Pct*100).toFixed(2)}% | setupScore:${result.score} entryScore:${entryScore} opt:${entryOpt.reason} | positions: ${S.openPositions.length}/${MAX_POSITIONS}`);
+
+  }finally{
+    // Always release the pending slot, whether execution succeeded or failed.
+    // The confirmed position is now tracked in S.openPositions instead.
+    _pendingExecutions.delete(result.symbol);
+    updateStats(); // refresh UI with authoritative counts
+  }
+
+  }finally{
+    // Release the execution mutex — allows next queued execution to proceed.
+    unlock();
+  }
+
+  } catch(e) {
+    log('e', `${result.symbol} execution error: ` + e.message);
+  } finally {
+    // CRITICAL: Always release the in-flight lock so the scanner can
+    // evaluate the coin on future cycles, regardless of fill/cancel/error.
+    _inFlightOrders.delete(result.symbol);
+    console.log(`[UNLOCK] ${result.symbol} released from in-flight registry.`);
+  }
+}
+
+// ============================================================
+// SECTION S — POSITION MONITORING + STAGED EXIT
+// ============================================================
+async function monitorPositions(){
+  if(!S.running) return;
+  try{
+    const live = await getPositions();
+
+    // Adopt positions opened externally (e.g. manual trades placed directly on Bybit)
+    // CRITICAL: Only adopt up to MAX_POSITIONS total — never exceed the hard cap.
+    // This prevents pre-existing or manually opened positions from bypassing the 1-trade limit.
+    // FIX Bug 10: skip adoption if connectAPI() is currently in its own adoption sequence.
+    if(!_adoptionLock){
+    for(const lp of live){
+      const sym = lp.symbol;
+      // Skip if bot is already tracking or processing this symbol
+      if(_inFlightOrders.has(sym) || _pendingExecutions.has(sym) || S.openPositions.find(p=>p.symbol===sym)) continue;
+      // Hard cap: never adopt more positions than MAX_POSITIONS allows
+      if(hardPositionCount() >= MAX_POSITIONS){
+        log('w',`ADOPT BLOCKED: ${sym} — cap already at ${hardPositionCount()}/${MAX_POSITIONS}. Close existing trade first.`);
+        continue;
+      }
+      const side2=lp.side==='Buy'?'LONG':'SHORT';
+      const ep=parseFloat(lp.avgPrice||0), qty=parseFloat(lp.size||0), lev=parseFloat(lp.leverage||10);
+      const adopted={
+        id:'bybit-'+sym, symbol:sym, side:side2, entryPrice:ep, qty, leverage:lev,
+        sl:parseFloat(lp.stopLoss||0), tp:parseFloat(lp.takeProfit||0),
+        tp1Price:ep*(side2==='LONG'?1.012:0.988), tp1Pct:0.012,
+        slPct:0.01, slMethod:'adopted',
+        openTime:Date.now(), status:'open', pnl:0, livePnl:parseFloat(lp.unrealisedPnl||0),
+        margin:(qty*ep)/lev, score:0, grade:'?', setupType:'ADOPTED',
+        tp1Hit:false, partialClosed1:false, runnerActive:false, trailStop:0,
+        breakeven:false,
+        tickSize:'0.01', qtyStep:0.001, // adopted positions use safe defaults
+        liqPrice:parseFloat(lp.liqPrice||0), currentPrice:ep, atr5:0, adopted:true
+      };
+      S.openPositions.push(adopted); S.trades.unshift(adopted);
+      log('w',`⚡ ADOPTED: ${sym} ${side2} ${lev}x @ ${ep}`);
+      updateTradeLog(); updateLivePanel();
+    }
+    }
+
+    // Detect positions Bybit closed (SL/TP hit or manual)
+    const liveSym = live.map(p=>p.symbol);
+    for(let i=S.openPositions.length-1;i>=0;i--){
+      const pos = S.openPositions[i];
+      if(!liveSym.includes(pos.symbol)){
+        const pnl = await getClosedPnl(pos.symbol);
+        pos.pnl=pnl; pos.status=pnl>=0?'closed':'stopped';
+        S.sessionPnl+=pnl; S.totalPnl+=pnl;
+        if(pnl>=0){ S.wins++; }
+        else { S.losses++; }
+        S.openPositions.splice(i,1);
+        checkSafetyControls(); saveState();
+        log(pnl>=0?'s':'w',`${pnl>=0?'✅':'❌'} ${pos.symbol} ${pos.side} CLOSED | P&L:${pnl>=0?'+':''}${pnl.toFixed(4)} USDT | ${S.wins}W/${S.losses}L`);
+        updateTradeLog(); updateStats(); updateLivePanel();
+      }
+    }
+
+    // Live P&L + staged exit management
+    for(const pos of S.openPositions){
+      const lp = live.find(p=>p.symbol===pos.symbol);
+      if(!lp) continue;
+      const cur = parseFloat(lp.markPrice||lp.avgPrice||pos.entryPrice);
+      pos.livePnl    = parseFloat(lp.unrealisedPnl||0);
+      pos.currentPrice = cur;
+      pos.liqPrice   = parseFloat(lp.liqPrice||0);
+      const gainPct  = pos.side==='LONG'
+        ? (cur-pos.entryPrice)/pos.entryPrice
+        : (pos.entryPrice-cur)/pos.entryPrice;
+
+      // ─────────────────────────────────────────────────────
+      // LEVEL 1 — FAST EXTRACTION (75% at TP1)
+      // Double-guarded: partialClosed1 flag + tp1Hit flag prevent duplicate triggers
+      // ─────────────────────────────────────────────────────
+      const tp1Reached = pos.tp1Price>0
+        ? (pos.side==='LONG' ? cur>=pos.tp1Price : cur<=pos.tp1Price)
+        : gainPct >= pos.tp1Pct * 0.92;
+
+      if(!pos.partialClosed1 && !pos.tp1Hit && tp1Reached){
+        // Immediately set BOTH flags to prevent race condition duplicate triggers
+        pos.partialClosed1 = true;
+        pos.tp1Hit = true;
+        saveState(); // Persist BEFORE placing order — ensures no duplicate on refresh
+
+        // Fetch live position size from Bybit to ensure qty accuracy
+        let actualQty = pos.qty;
+        try{
+          const liveCheck = await getPositions();
+          const livePosCheck = liveCheck.find(p=>p.symbol===pos.symbol);
+          if(livePosCheck) actualQty = parseFloat(livePosCheck.size || pos.qty);
+        }catch(e){}
+
+        // Clamp qty75 to actual live size (handles partial fills from entry)
+        const rawQty75 = actualQty * TP1_QTY_RATIO;
+        // Use stored instrument qtyStep from position object (set at trade entry).
+        // Falls back to legacy determineQtyStep only for adopted positions without stored step.
+        const qtyStep = pos.qtyStep || determineQtyStep(pos.qty);
+        const qtyDec  = qtyStep.toString().includes('.') ? qtyStep.toString().split('.')[1].length : 0;
+        const qty75   = parseFloat((Math.floor(rawQty75 / qtyStep) * qtyStep).toFixed(qtyDec));
+        const minClose = actualQty * 0.05;
+
+        if(qty75 >= minClose && qty75 <= actualQty){
+          // Derive price precision from stored tickSize for this position
+          const _ts = pos.tickSize || '0.01';
+          const _td = _ts.indexOf('.');
+          const pxDec = _td === -1 ? 0 : _ts.length - _td - 1;
+          const fmtPx = (n) => n.toFixed(pxDec);
+          try{
+            const ob = await pub(`/v5/market/orderbook?category=linear&symbol=${pos.symbol}&limit=5`);
+            const pSide = pos.side==='LONG'?'Sell':'Buy';
+            const pPrice = pos.side==='LONG'
+              ? parseFloat(ob.result?.b?.[0]?.[0]||cur)
+              : parseFloat(ob.result?.a?.[0]?.[0]||cur);
+            const pr = await api('POST','/v5/order/create',{
+              category:'linear',symbol:pos.symbol,side:pSide,orderType:'Limit',
+              qty:qty75.toFixed(qtyDec),price:fmtPx(pPrice),
+              timeInForce:'GTC',reduceOnly:true,positionIdx:0
+            });
+            if(pr.retCode===0){
+              // Update tracked qty to runner amount — use real qtyDec precision
+              pos.qty = parseFloat((actualQty - qty75).toFixed(qtyDec));
+              log('s',`💰 TP1 (75%) EXTRACTED: ${pos.symbol} limit @ ${fmtPx(pPrice)} | +${(gainPct*100).toFixed(2)}% | runner qty:${pos.qty}`);
+              // FIX Bug 5: Breakeven SL formatted with real tickSize precision
+              const beSLRaw = pos.side==='LONG' ? pos.entryPrice*1.0003 : pos.entryPrice*0.9997;
+              const beSL = fmtPx(beSLRaw);
+              try{
+                await api('POST','/v5/position/set-tpsl',{
+                  category:'linear',symbol:pos.symbol,
+                  stopLoss:beSL,slTriggerBy:'LastPrice',positionIdx:'0'
+                });
+                pos.sl=parseFloat(beSL); pos.breakeven=true;
+                log('s',`🔒 ${pos.symbol}: SL → breakeven+fee (${beSL}) — trade risk-free`);
+              }catch(e){ log('w',`${pos.symbol}: breakeven SL set warning: ${e.message}`); }
+              // Activate runner on remaining 25%
+              pos.runnerActive = getCfg().runnerEnabled;
+              // trailStop initial = current price +/- 1.5x ATR (ATR is already in price units, NOT %)
+              pos.trailStop = pos.side==='LONG'
+                ? cur - (pos.atr5 > 0 ? pos.atr5 * 1.5 : cur * 0.004)
+                : cur + (pos.atr5 > 0 ? pos.atr5 * 1.5 : cur * 0.004);
+              // Remove hard TP on runner (let trail do it)
+              try{
+                await api('POST','/v5/position/set-tpsl',{
+                  category:'linear',symbol:pos.symbol,
+                  takeProfit:'0',tpTriggerBy:'LastPrice',positionIdx:'0'
+                });
+              }catch(e){}
+              saveState();
+            } else {
+              // Order placement failed — reset flags so it can retry next cycle
+              pos.partialClosed1 = false; pos.tp1Hit = false;
+              log('e',`TP1 order failed (${pos.symbol}): ${pr.retMsg} — will retry`);
+              saveState();
+            }
+          }catch(e){
+            // Reset flags on exception so next cycle can retry
+            pos.partialClosed1 = false; pos.tp1Hit = false;
+            log('e',`TP1 partial error: ${e.message}`);
+            saveState();
+          }
+        } else {
+          // Qty too small or invalid — just mark done to prevent infinite retry
+          log('w',`${pos.symbol}: TP1 qty invalid (${qty75}) — marking done, no partial close`);
+          saveState();
+        }
+      }
+
+      // ─────────────────────────────────────────────────────
+      // LEVEL 2 — AGGRESSIVE RUNNER TRAIL (25%)
+      // Uses 5M EMA reclaim OR 5M swing lows/highs OR ATR trailing stop
+      // ─────────────────────────────────────────────────────
+      if(pos.runnerActive && pos.tp1Hit){
+        // atr5 is stored as absolute price value — use directly, do NOT divide by cur
+        const atrTrail = pos.atr5>0 ? pos.atr5*1.2 : cur*0.004;
+        let newTrail = pos.side==='LONG'
+          ? cur - atrTrail
+          : cur + atrTrail;
+
+        // Improve trail with 5M swing structure if available
+        // Fetch latest 5M data for swing trail (lightweight — 8 candles only)
+        try{
+          const r5t = await pub(`/v5/market/kline?category=linear&symbol=${pos.symbol}&interval=5&limit=10`);
+          const k5t = (r5t.result?.list||[]).reverse();
+          if(k5t.length>=6){
+            if(pos.side==='LONG'){
+              // Trail to most recent 5M swing low
+              const recentLows = k5t.slice(-6).map(k=>parseFloat(k[3]));
+              const recentLowsSlice = recentLows.slice(0,-1);
+              const swing5Low = recentLowsSlice.length > 0 ? Math.max(...recentLowsSlice) : 0; // highest of recent lows = tightest support
+              if(swing5Low > 0 && swing5Low > newTrail && swing5Low < cur*0.9998) newTrail = swing5Low * 0.9992;
+            } else {
+              // Trail to most recent 5M swing high
+              const recentHighs = k5t.slice(-6).map(k=>parseFloat(k[2]));
+              const recentHighsSlice = recentHighs.slice(0,-1);
+              const swing5High = recentHighsSlice.length > 0 ? Math.min(...recentHighsSlice) : 0;
+              // Only use swing5High if it's a valid number above current price
+              if(swing5High > 0 && isFinite(swing5High) && swing5High < newTrail && swing5High > cur*1.0002) newTrail = swing5High * 1.0008;
+            }
+          }
+        }catch(e){}
+
+        // Only ratchet — never widen the trail stop, and guard NaN/zero
+        if(isFinite(newTrail) && newTrail > 0 &&
+           ((pos.side==='LONG' && newTrail > pos.trailStop) ||
+            (pos.side==='SHORT' && newTrail < pos.trailStop))){
+          pos.trailStop = newTrail;
+          try{
+            // FIX Bug 6: Use real tickSize precision for trail SL submission
+            const _tts = pos.tickSize || '0.01';
+            const _ttd = _tts.indexOf('.');
+            const trailPxDec = _ttd === -1 ? 0 : _tts.length - _ttd - 1;
+            await api('POST','/v5/position/set-tpsl',{
+              category:'linear',symbol:pos.symbol,
+              stopLoss:newTrail.toFixed(trailPxDec),slTriggerBy:'LastPrice',positionIdx:'0'
+            });
+            pos.sl = newTrail;
+          }catch(e){}
+        }
+      }
+
+    }
+    updateLivePanel();
+  }catch(e){ log('e','Monitor: '+e.message); }
+}
+
+// Force close — releases slot for capital redeployment
+async function forceClosePosition(pos, reason='MANUAL'){
+  try{
+    // Cancel all open orders for this symbol first to avoid orphan orders
+    try{
+      await api('POST','/v5/order/cancel-all',{category:'linear',symbol:pos.symbol});
+    }catch(e){}
+    await sleep(200);
+    const ob = await pub(`/v5/market/orderbook?category=linear&symbol=${pos.symbol}&limit=3`);
+    const closeSide = pos.side==='LONG'?'Sell':'Buy';
+    const closePrice = pos.side==='LONG'
+      ? parseFloat(ob.result?.b?.[0]?.[0]||pos.currentPrice)
+      : parseFloat(ob.result?.a?.[0]?.[0]||pos.currentPrice);
+    // Use live exchange qty to avoid over-closing (especially after TP1 partial)
+    let closeQty = pos.qty;
+    try{
+      const liveCheck = await api('GET','/v5/position/list',{category:'linear',symbol:pos.symbol,settleCoin:'USDT'});
+      const livePos2 = (liveCheck.result?.list||[]).find(p=>p.symbol===pos.symbol&&parseFloat(p.size)>0);
+      if(livePos2) closeQty = parseFloat(livePos2.size||pos.qty);
+    }catch(e){}
+    // FIX Bug 4: Format qty with real instrument qtyStep precision, not raw toString()
+    const _fcQtyStep = pos.qtyStep || determineQtyStep(closeQty);
+    const _fcQtyDec  = _fcQtyStep.toString().includes('.') ? _fcQtyStep.toString().split('.')[1].length : 0;
+    const _fcQtyStr  = closeQty.toFixed(_fcQtyDec);
+    const res = await api('POST','/v5/order/create',{
+      category:'linear',symbol:pos.symbol,side:closeSide,
+      orderType:'Market',qty:_fcQtyStr,
+      timeInForce:'IOC',reduceOnly:true,positionIdx:0
+    });
+    if(res.retCode===0) log('w',`⛔ ${reason}: ${pos.symbol} market closed @ ~${closePrice}`);
+    else log('e',`Force close failed: ${res.retMsg}`);
+  }catch(e){ log('e','Force close error: '+e.message); }
+}
+
+// ============================================================
+// SECTION U — MARKET REGIME DETECTION
+// ============================================================
+async function updateRegime(){
+  try{
+    const [kBTC,fd] = await Promise.all([
+      pub(`/v5/market/kline?category=linear&symbol=BTCUSDT&interval=15&limit=24`),
+      pub(`/v5/market/tickers?category=linear`)
+    ]);
+    const kList = (kBTC.result?.list||[]).reverse();
+    let regimeScore=50, btcTrend='NEUTRAL', btcChange=0;
+    if(kList.length>5){
+      const closes = kList.map(x=>parseFloat(x[4]));
+      btcChange = ((closes[closes.length-1]-closes[0])/closes[0])*100;
+      btcTrend  = btcChange>1.5?'BULL':btcChange<-1.5?'BEAR':'NEUTRAL';
+      const atr = calcATR(kList,14);
+      const avgClose = closes.reduce((a,b)=>a+b,0)/closes.length;
+      const atrPct = avgClose>0?(atr/avgClose)*100:0;
+      if(atrPct>0.55) regimeScore+=25; else if(atrPct>0.30) regimeScore+=12; else regimeScore-=5;
+      if(Math.abs(btcChange)>3.0) regimeScore+=25; else if(Math.abs(btcChange)>1.5) regimeScore+=12;
+      const vols = kList.map(x=>parseFloat(x[5]));
+      const avgVol = vols.slice(0,-4).reduce((a,b)=>a+b,0)/Math.max(vols.length-4,1);
+      const recentVol = vols.slice(-4).reduce((a,b)=>a+b,0)/4;
+      if(avgVol>0&&recentVol>avgVol*1.3) regimeScore+=10;
+    }
+    const top = (fd.result?.list||[]).filter(t=>['BTCUSDT','ETHUSDT','SOLUSDT'].includes(t.symbol));
+    const avgFunding = top.reduce((s,t)=>s+Math.abs(parseFloat(t.fundingRate||0)),0)/Math.max(top.length,1);
+    if(avgFunding>0.003){ S.marketSafe=false; regimeScore-=30; } else S.marketSafe=true;
+    const sess = getSessionInfo();
+    if(sess.quality==='PRIME') regimeScore+=15; else if(sess.quality==='GOOD') regimeScore+=5; else regimeScore-=10;
+    S.btcTrend=btcTrend; S.btcChange=btcChange; S.avgFunding=avgFunding;
+    S.regimeScore = Math.max(0,Math.min(100,regimeScore));
+    if(S.regimeScore>=68&&S.marketSafe) S.regime='HOT';
+    else if(S.regimeScore>=42&&S.marketSafe) S.regime='WARM';
+    else S.regime='COLD';
+
+    // Section 12: Volatility circuit breaker — check BTC ATR spike
+    if(kList.length>5){
+      const closes = kList.map(x=>parseFloat(x[4]));
+      const atr15now = calcATR(kList,14);
+      const avgClose = closes.reduce((a,b)=>a+b,0)/closes.length;
+      const atrPct15 = avgClose>0 ? atr15now/avgClose : 0;
+      checkVolatilityCircuitBreaker(atrPct15);
+    }
+
+    const cfg = getCfg();
+    // UI
+    document.getElementById('mcBtc').textContent=btcTrend+' '+btcChange.toFixed(2)+'%';
+    document.getElementById('mcBtc').className='mc-val '+(btcTrend==='BULL'?'mc-green':btcTrend==='BEAR'?'mc-red':'mc-gold');
+    document.getElementById('mcFunding').textContent=(avgFunding*100).toFixed(4)+'%';
+    document.getElementById('mcFunding').className='mc-val '+(avgFunding>0.003?'mc-red':'mc-green');
+    document.getElementById('mcSession').textContent=sess.name;
+    document.getElementById('mcSession').className='mc-val '+(sess.quality==='PRIME'?'mc-green':sess.quality==='GOOD'?'mc-cyan':'mc-gold');
+    document.getElementById('mcRegime').textContent=S.regime+' '+S.regimeScore;
+    document.getElementById('mcRegime').className='mc-val '+(S.regime==='HOT'?'mc-orange':S.regime==='WARM'?'mc-gold':'mc-cyan');
+    // Update focus pairs count in market bar
+    document.getElementById('mcUniverse').textContent=S.focusPairs.length||S.tradableUniverse.length||'—';
+    const rb=document.getElementById('regimeBadge');
+    rb.textContent=cfg.label; rb.className='regime-badge regime-'+(S.regime==='HOT'?'hot':S.regime==='WARM'?'warm':'cold');
+    document.getElementById('regimeThresh').textContent=cfg.scoreThresh;
+    document.getElementById('regimeMaxPos').textContent=MAX_POSITIONS;
+    document.getElementById('regimeTp1').textContent=`${(cfg.tp1Min*100).toFixed(1)}%–${(cfg.tp1Max*100).toFixed(1)}%`;
+    document.getElementById('regimeCooldown').textContent=(cfg.cooldownMs/60000).toFixed(1)+'min';
+  }catch(e){ log('e','Regime: '+e.message); }
+}
+
+// ============================================================
+// ============================================================
+// SECTION V — SAFETY CONTROLS
+// Daily DD and consecutive-loss features fully removed.
+// Only the volatility circuit breaker remains.
+// ============================================================
+function checkSafetyControls(){
+  // All automatic pause mechanisms removed — bot runs until manually stopped.
+}
+
+// Volatility circuit breaker (Section 12)
+// Triggers when market regime becomes dangerously volatile (ATR spike > 3×)
+function checkVolatilityCircuitBreaker(atrPct){
+  // atrPct = current ATR as % of price on the 15M
+  // If volatility spikes beyond safe range, pause new entries (not exits)
+  if(atrPct > 0.025 && !S.volatilityBreaker){ // 2.5% ATR per candle = extreme
+    S.volatilityBreaker = true;
+    log('w',`⚠ VOLATILITY CIRCUIT BREAKER: ATR=${(atrPct*100).toFixed(2)}% — pausing new entries`);
+    showSafetyBanner(`VOLATILITY SPIKE: ${(atrPct*100).toFixed(2)}% ATR — no new entries`);
+    // Auto-clear after 10 minutes
+    setTimeout(()=>{
+      S.volatilityBreaker = false;
+      if(!S.paused) hideSafetyBanner();
+      log('i','↺ Volatility circuit breaker cleared');
+    }, 10*60*1000);
+  }
+}
+
+function triggerSafetyPause(reason){
+  S.paused=true; S.pauseReason=reason;
+  log('e',`🛑 SAFETY PAUSE: ${reason}`);
+}
+function showSafetyBanner(msg){ log('w','SAFETY: '+msg); }
+function hideSafetyBanner(){ }
+
+// ============================================================
+// SECTION W — ACCOUNT HELPERS
+// ============================================================
+async function getBalance(){
+  try{
+    const d = await api(
+      'GET',
+      '/v5/account/wallet-balance',
+      { accountType:'UNIFIED' }
+    );
+
+    const coins = d?.result?.list?.[0]?.coin || [];
+
+    // Find actual USDT wallet object
+    const usdt = coins.find(c => c.coin === 'USDT');
+
+    if(!usdt){
+      console.log('[BALANCE] No USDT wallet found in response — using fallback:', parseFloat(S.balance || 5));
+      log('w','[BALANCE] No USDT coin found in wallet response — using fallback balance');
+      return parseFloat(S.balance || 5);
+    }
+
+    console.log('[BALANCE] USDT WALLET OBJECT:', JSON.stringify(usdt));
+    log('i',`[BALANCE] USDT wallet: walletBalance=${usdt.walletBalance} equity=${usdt.equity} availableBalance=${usdt.availableBalance} availableToWithdraw=${usdt.availableToWithdraw}`);
+
+    // PRIORITY ORDER:
+    // 1. walletBalance  (total settled balance — most reliable for UNIFIED)
+    // 2. equity         (wallet + unrealised PnL)
+    // 3. availableBalance
+    // 4. availableToWithdraw
+    const balance =
+      parseFloat(usdt.walletBalance || 0) ||
+      parseFloat(usdt.equity || 0) ||
+      parseFloat(usdt.availableBalance || 0) ||
+      parseFloat(usdt.availableToWithdraw || 0);
+
+    console.log(`[BALANCE] Resolved USDT balance: ${balance}`);
+    log('s',`[BALANCE] ✅ Detected wallet balance: ${balance.toFixed(4)} USDT`);
+
+    if(balance <= 0 || isNaN(balance)){
+      console.log('[BALANCE] Parsed balance is zero/NaN — using fallback:', parseFloat(S.balance || 5));
+      log('w','[BALANCE] Balance parsed as zero/NaN — using fallback');
+      return parseFloat(S.balance || 5);
+    }
+
+    return balance;
+
+  }catch(err){
+    console.error('[BALANCE] Balance fetch failed:', err);
+    log('e','[BALANCE] Balance fetch error: '+err.message);
+    return parseFloat(S.balance || 5);
+  }
+}
+async function getPositions(){
+  try{
+    const d=await api('GET','/v5/position/list',{category:'linear',settleCoin:'USDT'});
+    return(d.result?.list||[]).filter(p=>parseFloat(p.size)>0);
+  }catch(e){ return []; }
+}
+async function getClosedPnl(sym){
+  try{
+    // FIX Bug 12: fetch more records and filter by time to avoid picking up a different
+    // trade's PnL when limit:1 returns the wrong (most recent) record for this symbol.
+    const pos = S.openPositions.find(p=>p.symbol===sym) || S.trades.find(t=>t.symbol===sym&&t.status==='open');
+    const openTime = pos ? pos.openTime : (Date.now() - 60000);
+    const d=await api('GET','/v5/position/closed-pnl',{category:'linear',symbol:sym,limit:5});
+    const l=d.result?.list||[];
+    if(!l.length) return 0;
+    // Find the record whose close time is after our openTime
+    const match = l.find(r => parseInt(r.updatedTime||r.createdTime||0) >= openTime);
+    return match ? parseFloat(match.closedPnl) : parseFloat(l[0].closedPnl);
+  }catch(e){ return 0; }
+}
+
+// ============================================================
+// SECTION X — DECOUPLED TWO-TIER SCANNER BOT LOOP
+// TIER-1: runs every 60s — lightweight ranking, fills focusPairs
+// TIER-2: runs every 6s — deep waterfall analysis on focus pairs
+// ============================================================
+
+// TIER-1: update focus list
+async function runTier1Scan(){
+  if(!S.running||!S.tradableUniverse.length) return;
+  try {
+  document.getElementById('scanTierBadge').textContent='TIER-1 RANKING';
+  document.getElementById('scanTierBadge').className='tier-pill tier1';
+  const ranked = await tier1MacroScan(S.tradableUniverse);
+  const deepN = S.regime==='HOT'?90:S.regime==='WARM'?70:50; // MINI v2: expanded scan pool for frequency compensation
+  S.focusPairs = ranked.slice(0,deepN).filter(p=>
+    !isCoolingDown(p.symbol) && !S.openPositions.find(pos=>pos.symbol===p.symbol)
+  );
+  document.getElementById('universeCount').textContent=S.focusPairs.length;
+  document.getElementById('universeFill').style.width=Math.min(100,(S.focusPairs.length/deepN)*100)+'%';
+  log('i',`📡 Tier-1 complete: ${S.focusPairs.length} focus pairs from ${S.tradableUniverse.length}`);
+  document.getElementById('scanTierBadge').textContent='TIER-2';
+  document.getElementById('scanTierBadge').className='tier-pill tier2';
+  } catch(e){ log('e','Tier-1 scan error: '+e.message); }
+}
+
+// TIER-2: deep waterfall analysis — mutex-protected to prevent recursive stacking
+// SECTION X — CORRECTED EXECUTION GATE: any setup passing analyzeSymbolStructural
+// is forwarded directly to openStructuralTrade() with no secondary threshold check.
+let _tier2Running = false;
+async function runTier2Scan(){
+  if(!S.running) return;
+  if(_tier2Running){ log('i','Tier-2: scan already running — skipped (mutex)'); return; }
+  _tier2Running = true;
+  try {
+    const cfg = getCfg();
+    const hasSlot = hasOpenSlot(); // pending-aware hard check
+    if(!hasSlot || !S.marketSafe || S.paused || !S.focusPairs.length){
+      const pending = _pendingExecutions.size;
+      document.getElementById('statStatus').textContent = S.paused?'PAUSED':!hasSlot?'IN TRADE':'STANDBY';
+      document.getElementById('scanStatus').textContent = S.paused?`paused: ${S.pauseReason.slice(0,40)}`
+        :!hasSlot?`${S.openPositions.length} open + ${pending} pending = ${hardPositionCount()}/${MAX_POSITIONS} slots`:'market unsafe';
+      _tier2Running = false;
+      return;
+    }
+    document.getElementById('statStatus').textContent='SCANNING';
+    document.getElementById('scanTierBadge').textContent='TIER-2 DEEP';
+    document.getElementById('scanTierBadge').className='tier-pill tier2';
+
+    // Filter out: cooling down, already open, already pending (in-flight), or locked in-flight registry
+    const candidates = S.focusPairs.filter(p=>
+      !isCoolingDown(p.symbol) &&
+      !S.openPositions.find(pos=>pos.symbol===p.symbol) &&
+      !_pendingExecutions.has(p.symbol) &&
+      !_inFlightOrders.has(p.symbol)
+    );
+    document.getElementById('scanStatus').textContent = `deep scan ${candidates.length} pairs (waterfall)...`;
+    document.getElementById('statScanSub').textContent = 'analyzing...';
+
+    const signals=[];
+    for(let i=0;i<candidates.length;i+=5){
+      if(!S.running){ _tier2Running = false; return; }
+      if(!hasOpenSlot()) break; // hard pending-aware check mid-scan
+      const batch=candidates.slice(i,i+5);
+      const res=await Promise.all(batch.map(p=>analyzeSymbolStructural(p)));
+      res.forEach(r=>{ if(r) signals.push(r); });
+      await sleep(80);
+    }
+
+    signals.sort((a,b)=>b.score-a.score);
+    updateSignalGrid(signals.slice(0,12));
+
+    if(signals.length>0){
+      updateScoreDisplay(signals[0]);
+      updateIndicatorGrid(signals[0]);
+      document.getElementById('scanStatus').textContent = `${signals.length} signals | best: ${signals[0].score}(${signals[0].grade}) ${signals[0].symbol} ${signals[0].setupType}`;
+      document.getElementById('statScanSub').textContent = `${signals.length} structural signals`;
+
+      // FIXED EXECUTION GATE: signals already cleared the full waterfall inside
+      // analyzeSymbolStructural (15M zone → reversal → 5M MSB → 1M pullback → scoring →
+      // counter-trend tax → spread/depth/fee checks). No secondary threshold re-check here.
+      // Every signal in the array is cleared for immediate transmission to the exchange.
+
+      // Sequential waterfall execution — submit ONE trade then stop.
+      // MAX_POSITIONS=1 means the moment a trade is submitted we must exit the loop entirely.
+      // Even if multiple signals passed the waterfall, only the highest-scored one fires.
+      for(let si=0; si<signals.length; si++){
+        if(!S.running) break;
+        if(!hasOpenSlot()) break; // hard stop — slot now consumed
+        const sig = signals[si];
+        if(_pendingExecutions.has(sig.symbol) || S.openPositions.find(p=>p.symbol===sig.symbol) || _inFlightOrders.has(sig.symbol)) continue;
+        await openStructuralTrade(sig);
+        break; // CRITICAL: always break after first submission — never submit a second trade this cycle
+      }
+    } else {
+      document.getElementById('scanStatus').textContent = `no structural setups found matching active parameters`;
+      document.getElementById('statScanSub').textContent = 'no signals';
+    }
+  } catch(e){ log('e','Tier-2 scan error: '+e.message); }
+  finally { _tier2Running = false; }
+}
+
+// Main loop: handles balance refresh, regime, universe, position monitoring
+// Tier-1 and Tier-2 run on their own independent timers
+async function botLoop(){
+  if(!S.running) return;
+  if(S.isLooping) return;
+  S.isLooping=true;
+  try{
+    S.loopCount++;
+    // Daily UTC reset check
+    checkDailyReset();
+    // Balance refresh every loop
+    const bal=await getBalance();
+    if(bal>0){ S.balance=bal; document.getElementById('balPillVal').textContent=bal.toFixed(4)+' USDT'; }
+    // Regime every ~30s
+    if(S.loopCount%5===1) await updateRegime();
+    // Monitor positions every loop
+    await monitorPositions();
+    // Universe rebuild every 30 min
+    if(S.tradableUniverse.length===0||(Date.now()-S.universeLastBuilt)>UNIVERSE_REFRESH_MS)
+      await buildUniverse();
+    updateStats();
+  }catch(e){ log('e','Loop: '+e.message); }
+  finally{ S.isLooping=false; if(S.running) S.botInterval=setTimeout(botLoop,6000); }
+}
+
+// ============================================================
+// SECTION Y — UI FUNCTIONS
+// ============================================================
+function updateSignalGrid(sigs){
+  const g=document.getElementById('signalGrid');
+  if(!sigs?.length){
+    g.innerHTML='<div class="signal-card"><div class="sc-pair">SCAN</div><div class="sc-signal sc-neut">—</div><div class="sc-score">scanning...</div></div>';
+    return;
+  }
+  g.innerHTML=sigs.slice(0,12).map(s=>{
+    const cls=s.signal==='LONG'?'bullish':s.signal==='SHORT'?'bearish':'';
+    const sc=s.signal==='LONG'?'sc-bull':s.signal==='SHORT'?'sc-bear':'sc-neut';
+    return`<div class="signal-card ${cls}"><div class="sc-pair">${s.symbol.replace('USDT','')}</div><div class="sc-signal ${sc}">${s.signal}</div><div class="sc-score">${s.score}(${s.grade})</div><div class="sc-setup">${s.setupType||'—'}</div></div>`;
+  }).join('');
+}
+
+// Live indicator grid — v8 adaptive signals
+function updateIndicatorGrid(result){
+  const grid = document.getElementById('indicatorGrid');
+  if(!result){ return; }
+
+  const d = result.direction;
+  const indicators = [
+    {
+      name:'15M ZONE',
+      val: result.atZone ? (result.zoneCheck?.nearSupport?'SUPPORT':'RESIST') : (d==='LONG'?'BIAS↑':'BIAS↓'),
+      cls: result.atZone ? 'bull' : 'neut',
+      vcls: result.atZone ? 'ind-bull' : 'ind-neut',
+      tip: result.reversalOk ? '★ REVERSAL CANDLE' : ''
+    },
+    {
+      name:'5M MSS/MSB',
+      val: result.structShift?.mss ? 'MSS✓' : result.structShift?.msb ? 'MSB✓' : 'NONE',
+      cls: result.structShift?.mss ? 'bull' : result.structShift?.msb ? 'neut' : 'bear',
+      vcls: result.structShift?.mss ? 'ind-bull' : result.structShift?.msb ? 'ind-neut' : 'ind-bear',
+    },
+    {
+      name:'5M SWEEP',
+      val: result.liquSweep?.swept ? `SWEPT ${(result.liquSweep.sweepDepth*100).toFixed(2)}%` : 'NONE',
+      cls: result.liquSweep?.swept ? 'bull' : 'neut',
+      vcls: result.liquSweep?.swept ? 'ind-bull' : 'ind-neut',
+    },
+    {
+      name:'5M DISPLACE',
+      val: result.displacement?.displaced ? `${(result.displacement.strength*100).toFixed(0)}% body` : 'NONE',
+      cls: result.displacement?.displaced ? (result.displacement.strength>0.75?'bull':'neut') : 'bear',
+      vcls: result.displacement?.displaced ? (result.displacement.strength>0.75?'ind-bull':'ind-neut') : 'ind-bear',
+    },
+    {
+      name:'VWAP/EMA',
+      val: result.vwapReclaim?.reclaimed ? 'VWAP✓' : result.emaReclaim?.reclaimed ? 'EMA21✓' : result.pullback?.nearVwap ? 'NEAR' : '—',
+      cls: (result.vwapReclaim?.reclaimed||result.emaReclaim?.reclaimed) ? 'bull' : 'neut',
+      vcls: (result.vwapReclaim?.reclaimed||result.emaReclaim?.reclaimed) ? 'ind-bull' : 'ind-neut',
+    },
+    {
+      name:'VOL EXPAND',
+      val: result.volExpansion?.strong ? `${result.volExpansion.ratio.toFixed(1)}x STRONG` : result.volExpansion?.expanding ? `${result.volExpansion.ratio.toFixed(1)}x` : result.volSig5?.ratio?.toFixed(2)+'x'||'—',
+      cls: result.volExpansion?.strong ? 'bull' : result.volExpansion?.expanding ? 'neut' : result.volSig5?.divergence ? 'bear' : 'neut',
+      vcls: result.volExpansion?.strong ? 'ind-bull' : result.volExpansion?.expanding ? 'ind-neut' : result.volSig5?.divergence ? 'ind-bear' : 'ind-neut',
+    },
+    {
+      name:'MOMENTUM',
+      val: result.rsi1 ? `RSI1:${result.rsi1.toFixed(0)}` : '—',
+      cls: d==='LONG'?(result.rsi1>52?'bull':result.rsi1>42?'neut':'bear'):(result.rsi1<48?'bull':result.rsi1<58?'neut':'bear'),
+      vcls: d==='LONG'?(result.rsi1>52?'ind-bull':result.rsi1>42?'ind-neut':'ind-bear'):(result.rsi1<48?'ind-bull':result.rsi1<58?'ind-neut':'ind-bear'),
+    },
+    {
+      name:'OI FLOW',
+      val: result.oiRising?'↑ RISING':result.oiFalling?'↓ FALLING':'FLAT',
+      cls: (result.oiRising&&d==='LONG')||(result.oiFalling&&d==='SHORT')?'bull':'neut',
+      vcls: (result.oiRising&&d==='LONG')||(result.oiFalling&&d==='SHORT')?'ind-bull':'ind-neut',
+    },
+    {
+      name:'1H SL',
+      val: result.sl4h ? (result.sl4h.slPct*100).toFixed(2)+'%' : '—',
+      cls: result.sl4h?.slPct<0.020?'bull':result.sl4h?'neut':'bear',
+      vcls: result.sl4h?.slPct<0.020?'ind-bull':result.sl4h?'ind-neut':'ind-bear',
+    },
+    {
+      name:'REGIME',
+      val: S.regime+' '+S.regimeScore,
+      cls: S.regimeScore>=68?'bull':S.regimeScore>=42?'neut':'bear',
+      vcls: S.regimeScore>=68?'ind-bull':S.regimeScore>=42?'ind-neut':'ind-bear',
+    },
+  ];
+
+  grid.innerHTML = indicators.map(ind=>
+    `<div class="ind-card ${ind.cls}">
+      <div class="ind-name">${ind.name}</div>
+      <div class="ind-val ${ind.vcls}">${ind.val}</div>
+      ${ind.tip?`<div style="font-size:.38rem;color:var(--gold);font-family:'Share Tech Mono'">${ind.tip}</div>`:''}
+    </div>`
+  ).join('');
+}
+
+function updateScoreDisplay(result){
+  if(!result) return;
+  document.getElementById('scoreSymbol').textContent=`${result.symbol.replace('USDT','')} — ${result.direction} — ${result.setupType||'—'}`;
+  const grade=result.grade||'—';
+  const gradeEl=document.getElementById('scoreGrade');
+  gradeEl.textContent=grade+' ('+result.score+')';
+  gradeEl.className='score-grade '+(grade==='A+'?'grade-a-plus':grade==='A'?'grade-a':grade==='B'?'grade-b':'grade-c');
+  const raw = result.rawScores || result.components || {};
+  const labels={
+    zone15:'15M ZONE', bias15:'15M BIAS', candle15:'15M CANDLE★',
+    mss5:'5M MSS', sweep5:'5M SWEEP', displacement:'DISPLACE',
+    vwap5:'VWAP/EMA', volume:'VOLUME', momentum:'MOMENTUM',
+    atr:'ATR', btc:'BTC CORR', oi:'OI FLOW'
+  };
+  const keys = Object.keys(SCORE_POOL);
+  document.getElementById('scoreBars').innerHTML=keys.map(k=>{
+    const maxPts = SCORE_POOL[k] || 10;
+    const frac   = Math.max(0, Math.min(1, raw[k] || 0));
+    const contrib= Math.round(maxPts * frac);
+    const pct    = Math.round(frac * 100);
+    const cls    = pct>=70?'high':pct>=35?'mid':'low';
+    const label  = labels[k] || k;
+    return`<div class="sbar"><div class="sbar-label">${label}</div><div class="sbar-track"><div class="sbar-fill ${cls}" style="width:${pct}%"></div></div><div class="sbar-num">${contrib}/${maxPts}</div></div>`;
+  }).join('');
+}
+
+function updateLivePanel(){
+  const panel=document.getElementById('livePanel');
+  const badge=document.getElementById('lpBadge');
+  if(!S.openPositions.length){ panel.classList.remove('active'); return; }
+  panel.classList.add('active');
+  const totalPnl=S.openPositions.reduce((s,p)=>s+(p.livePnl||0),0);
+  badge.textContent=`${S.openPositions.length} POSITION${S.openPositions.length>1?'S':''}`;
+  badge.className='lp-badge'+(totalPnl>0?' long':totalPnl<0?' short':'');
+  document.getElementById('positionsGrid').innerHTML=S.openPositions.map(pos=>{
+    const pnl=pos.livePnl||0;
+    const pnlCls=pnl>0?'pos':pnl<0?'neg':'zero';
+    const pnlPct=pos.margin>0?(pnl/pos.margin)*100:0;
+    const ageMinsFlt=((Date.now()-pos.openTime)/60000);
+    const ageMins=ageMinsFlt.toFixed(0);
+    const cfg=getCfg();
+    let stage='TP1 HUNT', stageCls='stage-hunt';
+    if(pos.runnerActive){ stage='RUNNER TRAIL'; stageCls='stage-trail'; }
+    else if(pos.tp1Hit){ stage='BE PROTECTED'; stageCls='stage-be'; }
+    return`<div class="pos-card ${pos.side==='LONG'?'long-card':'short-card'}">
+      <div class="pc-item"><div class="pc-label">Coin</div><div class="pc-val pc-coin">${pos.symbol.replace('USDT','')}</div><div style="font-family:'Share Tech Mono';font-size:.46rem;color:var(--text2)">${pos.side} ${pos.leverage}x | setup:${pos.grade||'?'} entry:${pos.entryScore||'—'}</div></div>
+      <div class="pc-item"><div class="pc-label">Live P&L</div><div class="pc-val pc-pnl ${pnlCls}">${pnl>=0?'+$':'$'}${Math.abs(pnl).toFixed(4)}</div><div style="font-family:'Rajdhani';font-size:.75rem;color:${pnlPct>=0?'var(--green)':'var(--red)'}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</div><div class="pc-stage ${stageCls}">${stage}</div></div>
+      <div class="pc-item"><div class="pc-label">Entry</div><div class="pc-val pc-sm pc-cyan">${(pos.entryPrice||0).toFixed(5)}</div><div class="pc-label" style="margin-top:3px">Setup</div><div style="font-family:'Share Tech Mono';font-size:.44rem;color:var(--orange)">${pos.setupType||'—'}</div></div>
+      <div class="pc-item"><div class="pc-label">Current</div><div class="pc-val pc-sm pc-cyan">${(pos.currentPrice||0).toFixed(5)}</div><div class="pc-label" style="margin-top:3px">Age</div><div style="font-family:'Share Tech Mono';font-size:.5rem;color:var(--text2)">${ageMins}min</div></div>
+      <div class="pc-item"><div class="pc-label">SL (1H)</div><div class="pc-val pc-sm pc-red">${(pos.sl||0).toFixed(5)}</div><div class="pc-label" style="margin-top:3px">SL Method</div><div style="font-family:'Share Tech Mono';font-size:.44rem;color:var(--text2)">${pos.slMethod||'—'}</div></div>
+      <div class="pc-item"><div class="pc-label">TP1 (ATR)</div><div class="pc-val pc-sm pc-green">${(pos.tp1Price||0).toFixed(5)}</div><div class="pc-label" style="margin-top:3px">Runner</div><div style="font-family:'Share Tech Mono';font-size:.5rem;color:${pos.runnerActive?'var(--purple)':'var(--text2)'}">${pos.runnerActive?'ACTIVE':'—'}</div></div>
+      <div class="pc-item"><button class="pc-close-btn" onclick="askClose('${pos.symbol}')">⛔ CLOSE</button></div>
+    </div>`;
+  }).join('');
+}
+
+function updateStats(){
+  const bal=S.balance||0;
+  document.getElementById('statBalance').textContent=bal.toFixed(4);
+  const pnl=S.sessionPnl;
+  const el=document.getElementById('statPnl');
+  el.textContent=(pnl>=0?'+':'')+pnl.toFixed(4);
+  el.className='stat-value '+(pnl>=0?'green':'red');
+  const pct=S.startBalance>0?(pnl/S.startBalance*100):0;
+  document.getElementById('statPnlPct').textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';
+  document.getElementById('statTrades').textContent=S.trades.length;
+  const wr=S.wins+S.losses>0?Math.round(S.wins/(S.wins+S.losses)*100):0;
+  document.getElementById('statWR').textContent=`W:${S.wins} L:${S.losses} (${wr}%)`;
+  // Pending-aware counts — authoritative display, can never show impossible states
+  const open    = S.openPositions.length;
+  const pending = _pendingExecutions.size;
+  const total   = hardPositionCount(); // open + pending
+  const slots   = Math.max(0, MAX_POSITIONS - total); // never negative
+  const openDisplay = pending > 0 ? `${open}+${pending}p/${MAX_POSITIONS}` : `${open}/${MAX_POSITIONS}`;
+  document.getElementById('statOpen').textContent = openDisplay;
+  document.getElementById('statOpen').className='stat-value '+(total>=MAX_POSITIONS?'red':total>0?'yellow':'cyan');
+  document.getElementById('statSlots').textContent = pending > 0
+    ? `${slots} slot${slots!==1?'s':''} (${pending} pending)`
+    : `${slots} remaining`;
+  document.getElementById('spPnl').textContent=(S.sessionPnl>=0?'+$':'$')+S.sessionPnl.toFixed(4);
+  if(!S.running) document.getElementById('statStatus').textContent='IDLE';
+}
+
+function updateTradeLog(){
+  const logEl=document.getElementById('tradeLog');
+  document.getElementById('logCount').textContent=S.trades.length+' trades';
+  if(!S.trades.length) return;
+  logEl.innerHTML=S.trades.slice(0,80).map(t=>{
+    const isOpen=t.status==='open';
+    const pnlVal=isOpen?(t.livePnl!==undefined?(t.livePnl>=0?'+':'')+(t.livePnl||0).toFixed(4):'...'):(t.pnl>=0?'+':'')+t.pnl.toFixed(4);
+    const pc=(isOpen?t.livePnl:t.pnl)>=0?'te-pnl-pos':'te-pnl-neg';
+    const sc=t.side==='LONG'?'te-long':'te-short';
+    const stc=isOpen?'te-open':t.status==='closed'?'te-closed':'te-stopped';
+    const ec=isOpen?'open':t.status==='closed'&&t.pnl>=0?'win':'loss';
+    const tm=new Date(t.openTime).toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit'});
+    const grade=t.grade||'?';
+    return`<div class="trade-entry ${ec}"><span class="te-time">${tm}</span><span class="te-pair">${t.symbol.replace('USDT','')}</span><span class="${sc}">${t.side[0]}</span><span style="font-family:'Share Tech Mono';font-size:.44rem;color:${grade==='A+'?'var(--green)':grade==='A'?'var(--gold)':'var(--orange)'}">${grade}${t.entryScore?'/E'+t.entryScore:''}</span><span class="${pc}">${pnlVal}</span><span class="${stc}">${t.status.toUpperCase().slice(0,5)}</span><span class="te-setup">${t.setupType||'—'}</span></div>`;
+  }).join('');
+}
+
+// ============================================================
+// SECTION Z — CONNECT / START / STOP / RESET
+// ============================================================
+async function connectAPI(){
+  const key=document.getElementById('apiKey').value.trim();
+  const secret=document.getElementById('apiSecret').value.trim();
+  const net=document.getElementById('network').value;
+  if(!key||!secret){ alert('Enter both API Key and Secret.'); return; }
+  S.apiKey=key; S.apiSecret=secret; S.baseUrl=URLS[net];
+  const btn=document.getElementById('connectBtn');
+  btn.disabled=true; btn.textContent='Connecting...';
+  log('i','Connecting to Bybit '+net+'...');
+  try{
+    const bal=await getBalance();
+    if(bal===null||isNaN(bal)) throw new Error('Invalid response — check keys and IP whitelist');
+    S.balance=bal; S.connected=true;
+    const sc=parseFloat(document.getElementById('startCapital').value)||bal;
+    S.startBalance=sc;
+    document.getElementById('connDot').className='dot live';
+    document.getElementById('connLabel').textContent='CONNECTED';
+    document.getElementById('balPill').classList.remove('hidden');
+    document.getElementById('balPillVal').textContent=bal.toFixed(4)+' USDT';
+    document.getElementById('startBtn').classList.remove('hidden');
+    document.getElementById('startBtn').disabled=false;
+    btn.classList.add('hidden');
+    log('s',`✅ Connected! Balance: ${bal.toFixed(4)} USDT`);
+    // Restore persistent state
+    loadState();
+    await updateRegime();
+    await buildUniverse();
+    updateStats();
+    updateTradeLog();
+    // Sync live positions from Bybit
+    // FIX Bug 10: set adoption lock so monitorPositions doesn't race with this sequence
+    _adoptionLock = true;
+    const livePos = await getPositions();
+    log('i',`Bybit live positions: ${livePos.length}`);
+    livePos.forEach(lp=>{
+      const sym=lp.symbol;
+      if(!S.openPositions.find(p=>p.symbol===sym)){
+        const side2=lp.side==='Buy'?'LONG':'SHORT';
+        const ep=parseFloat(lp.avgPrice||0), qty=parseFloat(lp.size||0), lev=parseFloat(lp.leverage||10);
+        const adopted={
+          id:'bybit-'+sym, symbol:sym, side:side2, entryPrice:ep, qty, leverage:lev,
+          sl:parseFloat(lp.stopLoss||0), tp:parseFloat(lp.takeProfit||0),
+          tp1Price:ep*(side2==='LONG'?1.012:0.988), tp1Pct:0.012,
+          slPct:0.01, slMethod:'adopted',
+          openTime:Date.now(), status:'open', pnl:0, livePnl:parseFloat(lp.unrealisedPnl||0),
+          margin:(qty*ep)/lev, score:0, grade:'?', setupType:'ADOPTED',
+          tp1Hit:false, partialClosed1:false, runnerActive:false, trailStop:0,
+          breakeven:false,
+          tickSize:'0.01', qtyStep:0.001, // adopted positions use safe defaults
+          liqPrice:parseFloat(lp.liqPrice||0), currentPrice:ep, atr5:0, adopted:true
+        };
+        S.openPositions.push(adopted);
+        log('w',`↺ Restored: ${sym} ${side2} ${lev}x @ ${ep}`);
+      }
+    });
+    _adoptionLock = false;
+    updateLivePanel();
+  }catch(e){
+    _adoptionLock = false;
+    log('e','Connection failed: '+e.message);
+    btn.disabled=false; btn.textContent='⚡ Connect & Verify';
+    document.getElementById('connDot').className='dot error';
+    document.getElementById('connLabel').textContent='ERROR';
+  }
+}
+
+function startBot(){
+  if(!S.connected){ alert('Connect first.'); return; }
+  S.running=true;
+  document.getElementById('startBtn').classList.add('hidden');
+  document.getElementById('stopBtn').classList.remove('hidden');
+  document.getElementById('botDot').className='dot running';
+  document.getElementById('botLabel').textContent='BOT RUNNING';
+  document.getElementById('statStatus').textContent='STARTING';
+  log('s','▶ SCALPER MAGIMA MINI started — 1H Structural SL | Setup layer: 12-factor adaptive scoring (v8, intact) | Entry layer: MSS pullback + VWAP retest + candle window + entryScore | HOT≥60 WARM≥63 COLD≥67 | T1=15s T2=2s');
+  // Start Tier-1 scan immediately then every 60s
+  runTier1Scan();
+  S.tier1Interval = setInterval(runTier1Scan, TIER1_INTERVAL_MS);
+  // Start Tier-2 scan every 6s
+  S.tier2Interval = setInterval(runTier2Scan, TIER2_INTERVAL_MS);
+  // Main management loop
+  botLoop();
+}
+
+function stopBot(){
+  S.running=false;
+  _tier2Running = false; // release mutex — any in-flight scan will terminate on next S.running check
+  _execLocked = false;   // release execution mutex — any queued submissions will abort
+  _execQueue.length = 0; // drain queue
+  _pendingExecutions.clear(); // clear pending slots — positions were either filled or not
+  _inFlightOrders.clear();   // FIX Bug 11: release all in-flight locks so no symbol is permanently blacklisted
+  clearTimeout(S.botInterval);
+  clearInterval(S.tier1Interval);
+  clearInterval(S.tier2Interval);
+  document.getElementById('stopBtn').classList.add('hidden');
+  document.getElementById('startBtn').classList.remove('hidden');
+  document.getElementById('botDot').className='dot';
+  document.getElementById('botLabel').textContent='BOT IDLE';
+  document.getElementById('statStatus').textContent='IDLE';
+  document.getElementById('statScanSub').textContent='stopped';
+  document.getElementById('scanStatus').textContent='— stopped';
+  log('w','⏹ Bot stopped.');
+}
+
+function clearAll(){
+  if(S.running){ alert('Stop the bot first.'); return; }
+  if(!confirm('Reset all state? Clears trade history and connection.')) return;
+  clearInterval(S.tier1Interval); clearInterval(S.tier2Interval);
+  // Release all mutexes and session caches
+  _tier2Running = false;
+  _execLocked = false;
+  _execQueue.length = 0;
+  _pendingExecutions.clear();
+  _inFlightOrders.clear();
+  _crossMarginSet.clear();
+  _klineCache.clear();
+  _lastResetDay = new Date().getUTCDate(); // reset daily tracker
+  localStorage.removeItem('magima_mini_v1_state');
+  localStorage.removeItem('magima_v4_state');
+  localStorage.removeItem('magima_v3_state');
+  S={
+    connected:false,running:false,apiKey:'',apiSecret:'',baseUrl:URLS.mainnet,
+    balance:0,startBalance:10,totalPnl:0,sessionPnl:0,
+    trades:[],openPositions:[],wins:0,losses:0,
+    isLooping:false,botInterval:null,loopCount:0,tier1Interval:null,tier2Interval:null,
+    marketSafe:true,btcTrend:'NEUTRAL',btcChange:0,avgFunding:0,
+    paused:false,pauseReason:'',volatilityBreaker:false,
+    coinLastTrade:{},tradableUniverse:[],universeLastBuilt:0,focusPairs:[],
+    regime:'COLD',regimeScore:0,modalTargetSymbol:null,
+  };
+  ['apiKey','apiSecret'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('connDot').className='dot';
+  document.getElementById('connLabel').textContent='DISCONNECTED';
+  document.getElementById('botDot').className='dot';
+  document.getElementById('botLabel').textContent='BOT IDLE';
+  document.getElementById('balPill').classList.add('hidden');
+  document.getElementById('connectBtn').classList.remove('hidden');
+  document.getElementById('connectBtn').disabled=false;
+  document.getElementById('connectBtn').textContent='⚡ Connect & Verify';
+  document.getElementById('startBtn').classList.add('hidden');
+  document.getElementById('stopBtn').classList.add('hidden');
+  document.getElementById('livePanel').classList.remove('active');
+  document.getElementById('universeCount').textContent='0';
+  document.getElementById('universeTotal').textContent='0';
+  document.getElementById('universeFill').style.width='0%';
+  document.getElementById('universeLastUpdate').textContent='not built yet';
+  document.getElementById('tradeLog').innerHTML='<div style="color:var(--text2);font-family:\'Share Tech Mono\';font-size:.56rem;padding:12px;text-align:center;opacity:.5">No trades yet.</div>';
+  document.getElementById('logCount').textContent='0 trades';
+  hideSafetyBanner();
+  updateStats();
+  log('i','↺ Reset complete — SCALPER MAGIMA MINI ready.');
+}
+
+// ============================================================
+// CLOSE MODAL
+// ============================================================
+function askClose(symbol){
+  S.modalTargetSymbol=symbol;
+  const pos=S.openPositions.find(p=>p.symbol===symbol); if(!pos) return;
+  const cur=pos.currentPrice||pos.entryPrice||0;
+  document.getElementById('modalCoin').textContent=symbol+' ('+pos.side+')';
+  document.getElementById('modalCurPrice').textContent=cur?cur.toFixed(5):'—';
+  const pnl=pos.livePnl||0;
+  const pnlEl=document.getElementById('modalPnl');
+  pnlEl.textContent=(pnl>=0?'+$':'$')+Math.abs(pnl).toFixed(4);
+  pnlEl.style.color=pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--gold)';
+  document.getElementById('modalEntry').textContent=pos.entryPrice?pos.entryPrice.toFixed(5):'—';
+  const sideEl=document.getElementById('modalSide');
+  sideEl.textContent=pos.side; sideEl.style.color=pos.side==='LONG'?'var(--green)':'var(--red)';
+  document.getElementById('modalLimitPrice').value='';
+  document.getElementById('confirmModal').classList.add('active');
+}
+function cancelClose(){ document.getElementById('confirmModal').classList.remove('active'); S.modalTargetSymbol=null; }
+async function confirmClose(){
+  document.getElementById('confirmModal').classList.remove('active');
+  const symbol=S.modalTargetSymbol; S.modalTargetSymbol=null; if(!symbol) return;
+  const pos=S.openPositions.find(p=>p.symbol===symbol); if(!pos) return;
+  try{
+    // Derive price precision from stored tickSize
+    const _ts = pos.tickSize || '0.01';
+    const _td = _ts.indexOf('.');
+    const _pxDec = _td === -1 ? 0 : _ts.length - _td - 1;
+    const fmtPx = (n) => n.toFixed(_pxDec);
+    // Derive qty precision from stored qtyStep
+    const _qs = pos.qtyStep || determineQtyStep(pos.qty);
+    const _qd = _qs.toString().includes('.') ? _qs.toString().split('.')[1].length : 0;
+    const customPrice=parseFloat(document.getElementById('modalLimitPrice').value);
+    let limitPrice;
+    if(customPrice&&customPrice>0){ limitPrice=fmtPx(customPrice); }
+    else{
+      const ob=await pub(`/v5/market/orderbook?category=linear&symbol=${symbol}&limit=5`);
+      const bestBid=parseFloat(ob.result?.b?.[0]?.[0]||0);
+      const bestAsk=parseFloat(ob.result?.a?.[0]?.[0]||0);
+      if(!bestBid||!bestAsk){ log('e','OB fetch failed for close'); return; }
+      limitPrice=fmtPx(pos.side==='LONG'?bestBid:bestAsk);
+    }
+    const closeSide=pos.side==='LONG'?'Sell':'Buy';
+    const res=await api('POST','/v5/order/create',{
+      category:'linear',symbol,side:closeSide,orderType:'Limit',
+      qty:pos.qty.toFixed(_qd),price:limitPrice,
+      timeInForce:'GTC',reduceOnly:true,positionIdx:0
+    });
+    if(res.retCode===0) log('s',`⛔ Manual close placed: ${symbol} @ ${limitPrice}`);
+    else log('e',`Close failed: ${res.retMsg}`);
+  }catch(e){ log('e','Close error: '+e.message); }
+}
+
+// ============================================================
+// TRADE REPORTS
+// ============================================================
+function downloadReport(type){
+  if(!S.trades.length){ alert('No trades yet.'); return; }
+  const now=new Date(); let trades=S.trades; let title='';
+  if(type==='today'){ const today=now.toDateString(); trades=S.trades.filter(t=>new Date(t.openTime).toDateString()===today); title=`SCALPER MAGIMA — Daily (${now.toLocaleDateString()})`; }
+  else if(type==='month'){ const m=now.getMonth(),y=now.getFullYear(); trades=S.trades.filter(t=>{const d=new Date(t.openTime);return d.getMonth()===m&&d.getFullYear()===y;}); title=`SCALPER MAGIMA — Monthly`; }
+  else if(type==='last'){ trades=S.trades.slice(0,1); title='SCALPER MAGIMA — Last Trade'; }
+  else title='SCALPER MAGIMA — Full History';
+  if(!trades.length){ alert('No trades for this period.'); return; }
+  const wins=trades.filter(t=>t.pnl>0).length, losses=trades.filter(t=>t.pnl<0).length;
+  const totalPnl=trades.reduce((s,t)=>s+(t.pnl||0),0);
+  const wr=trades.length>0?((wins/trades.length)*100).toFixed(1):0;
+  let txt=`${title}\n${'='.repeat(90)}\n`;
+  txt+=`Generated: ${now.toLocaleString()}\nBot: SCALPER MAGIMA MINI — 1H Structural SL | 15M▸5M▸1M Waterfall\n`;
+  txt+=`Total: ${trades.length} | W:${wins} L:${losses} WR:${wr}% | P&L: ${totalPnl>=0?'+':''}${totalPnl.toFixed(4)} USDT\n${'='.repeat(90)}\n\n`;
+  txt+=`${'#'.padEnd(4)} ${'Time'.padEnd(18)} ${'Coin'.padEnd(12)} ${'Side'.padEnd(6)} ${'Setup'.padEnd(16)} ${'Grade'.padEnd(6)} ${'Entry'.padEnd(12)} ${'Lev'.padEnd(5)} ${'SL Method'.padEnd(20)} ${'P&L'.padEnd(14)} Status\n`;
+  txt+=`${'-'.repeat(115)}\n`;
+  trades.forEach((t,i)=>{
+    const time=new Date(t.openTime).toLocaleString();
+    const pnlStr=(t.pnl>=0?'+':'')+t.pnl.toFixed(4)+' USDT';
+    txt+=`${String(i+1).padEnd(4)} ${time.padEnd(18)} ${t.symbol.replace('USDT','').padEnd(12)} ${t.side.padEnd(6)} ${(t.setupType||'—').padEnd(16)} ${(t.grade||'?').padEnd(6)} ${(t.entryPrice||0).toFixed(4).padEnd(12)} ${String(t.leverage||'?')+'x'.padEnd(5)} ${(t.slMethod||'—').padEnd(20)} ${pnlStr.padEnd(14)} ${(t.status||'').toUpperCase()}\n`;
+  });
+  txt+=`\n${'='.repeat(90)}\nEnd of report.\n`;
+  const blob=new Blob([txt],{type:'text/plain'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`ScalperMagimaMINI_${type}_${now.toISOString().slice(0,10)}.txt`; a.click(); URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>
